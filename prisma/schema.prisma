@@ -1,0 +1,146 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+    provider   = "postgresql"
+    url        = env("DATABASE_URL")
+    extensions = [vector]
+}
+
+model User {
+    id        String   @id @default(cuid())
+    email     String   @unique
+    firstName String
+    lastName  String
+    image     String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    repos     Repo[]
+}
+
+model Repo {
+    id          String     @id @default(cuid())
+    name        String
+    githubUrl   String
+    accessToken String
+    createdAt   DateTime   @default(now())
+    updatedAt   DateTime   @updatedAt
+    userId      String
+    user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    tutorials   Tutorial[]
+
+    @@index([userId, createdAt])
+    @@index([githubUrl, userId])
+}
+
+model Tutorial {
+    id                  String                @id @default(cuid())
+    repoId              String
+    title               String
+    description         String?
+    repository          String
+    createdAt           DateTime              @default(now())
+    updatedAt           DateTime              @updatedAt
+    chapters            Chapter[]
+    repo                Repo                  @relation(fields: [repoId], references: [id], onDelete: Cascade)
+    chatSessions        ChatSession[]
+    SourceCodeEmbedding SourceCodeEmbedding[]
+
+    @@index([repoId, createdAt])
+}
+
+model Chapter {
+    id            String       @id @default(cuid())
+    tutorialId    String
+    chapterNumber Int
+    title         String
+    createdAt     DateTime     @default(now())
+    updatedAt     DateTime     @updatedAt
+    subChapters   SubChapter[]
+    tutorial      Tutorial     @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+
+    @@unique([tutorialId, chapterNumber])
+    @@index([tutorialId, chapterNumber])
+}
+
+model SubChapter {
+    id              String        @id @default(cuid())
+    chapterId       String
+    subChapterTitle String
+    explanation     String
+    diagram         String?
+    createdAt       DateTime      @default(now())
+    updatedAt       DateTime      @updatedAt
+    codeSnippets    CodeSnippet[]
+    chapter         Chapter       @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+}
+
+model CodeSnippet {
+    id           String     @id @default(cuid())
+    subChapterId String
+    fileRef      String
+    sourceCode   String
+    language     String?
+    createdAt    DateTime   @default(now())
+    updatedAt    DateTime   @updatedAt
+    subChapter   SubChapter @relation(fields: [subChapterId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+    USER
+    SYSTEM
+    ASSISTANT
+}
+
+model SourceCodeEmbedding {
+    id               String                      @id @default(cuid())
+    summaryEmbedding Unsupported("vector(768)")?
+    sourceCode       String
+    fileName         String
+    embedding        Float[]
+    summary          String
+    tutorialId       String
+    createdAt        DateTime                    @default(now())
+    updatedAt        DateTime                    @updatedAt
+    tutorial         Tutorial                    @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+
+    @@index([tutorialId, fileName])
+}
+
+model ChatSession {
+    id         String        @id @default(cuid())
+    tutorialId String
+    title      String?
+    isActive   Boolean       @default(true)
+    createdAt  DateTime      @default(now())
+    updatedAt  DateTime      @updatedAt
+    tutorial   Tutorial      @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+    messages   ChatMessage[]
+
+    @@index([tutorialId, createdAt])
+}
+
+model ChatMessage {
+    id        String      @id @default(cuid())
+    role      Role
+    content   String
+    createdAt DateTime    @default(now())
+    chatId    String
+    chat      ChatSession @relation(fields: [chatId], references: [id], onDelete: Cascade)
+    aiAnswer  AiAnswer[]
+
+    @@index([chatId, createdAt])
+}
+
+model AiAnswer {
+    id            String      @id @default(cuid())
+    explanation   String
+    diagram       String?
+    fileRef       Json
+    chatMessageId String      @unique
+    chatMessage   ChatMessage @relation(fields: [chatMessageId], references: [id], onDelete: Cascade)
+
+    @@index([chatMessageId])
+}
