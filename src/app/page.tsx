@@ -1,4 +1,3 @@
-"use client"
 import React from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -13,14 +12,12 @@ import ThreeStepProcess from '@/components/main/HowItWorks'
 import Footer from '@/components/main/Footer'
 import ShowCase from '@/components/main/ShowCase'
 import ShowCaseAi from '@/components/main/ShowCaseAi'
-import { useUser } from '@clerk/nextjs'
 
 
 const HomePage = () => {
-  const {user} = useUser()
   return (
     <div className="min-h-screen flex flex-col">
-      <NavBar user={user} />
+      <NavBar />
       
       <section id="home" 
         className="

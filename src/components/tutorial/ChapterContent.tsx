@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import mermaid from 'mermaid';
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
-import { github } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import github from "react-syntax-highlighter/dist/esm/styles/hljs/github";
 
 
 interface CodeSnippet {

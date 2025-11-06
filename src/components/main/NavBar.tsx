@@ -1,11 +1,15 @@
+"use client"
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { ShineBorder } from "../ShineBorder";
 import MobileNav from "./MobileNav";
+import { useUser } from '@clerk/nextjs'
 
-export default function NavBar({user}) {
+
+export default function NavBar() {
+  const user = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
