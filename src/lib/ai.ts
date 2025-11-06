@@ -7,13 +7,12 @@ import { createTutorialPrompt } from "./prompt";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function generateTutorial(githubUrl: string, accessToken: string): Promise<any> {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" }); 
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" }); 
   
   try {
     const tutorialData = await getTutorialDataWithSeparation(githubUrl, accessToken);
     const llmPrompt = createTutorialPrompt(tutorialData);
 
-    console.log("Sending prompt to AI model...");
     const result = await model.generateContent(llmPrompt);
     const response = result.response;
     let responseText = response.text();
@@ -59,7 +58,6 @@ export async function generateTutorial(githubUrl: string, accessToken: string): 
         console.log(repairedJson.substring(Math.max(0, errorPos - 100), errorPos + 100));
         console.log("================================");
         
-        // Try to extract just the JSON object
         const jsonStart = repairedJson.indexOf('{');
         const jsonEnd = repairedJson.lastIndexOf('}');
         

@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable}`}>
       
-      <body className="bg-[#f6f6f6]">
+      <body className="">
 
 
         <ClerkProvider

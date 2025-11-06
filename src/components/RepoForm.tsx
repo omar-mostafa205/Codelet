@@ -22,15 +22,11 @@ import React, { useState } from "react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { useUser } from "@clerk/nextjs"
-import { Span } from "next/dist/trace"
-import { Space_Mono } from "next/font/google"
-
 
 const formSchema = z.object({
   githubUrl: z.string().url("Please provide a valid URL").regex(/^https:\/\/github\.com\//, "Must be a valid GitHub repository URL"),
   accessToken : z.string(),
 })
-
 
 export function RepoForm() {
   const {user} = useUser()
@@ -47,9 +43,8 @@ const createRepo = api.project.createRepo.useMutation({
 
     if(data){
       toast.success("Tutorial created successfully")
-      window.location.href = `/tutorial/${data.id}`
+      window.location.href = `/dashboard`
     }
-
 
     },
       onError : async (error)=>{
@@ -57,8 +52,7 @@ const createRepo = api.project.createRepo.useMutation({
         const { data } = await refetchLatestTutorial();
 
         if(data){
-          toast.success("Tutorial created successfully")
-          window.location.href = `/tutorial/${data.id}`
+          window.location.href = `/dashboard`
         }
     
   
@@ -118,7 +112,7 @@ const createRepo = api.project.createRepo.useMutation({
                         {...field}
                         disabled={isLoading}
                         type="url"
-                        className="h-12 text-base px-4 bg-background border-input focus-visible:ring-[#b9cbe4]"
+                        className="h-12 text-base px-4 bg-background border-input focus-visible:ring-purple-500"
                       />
                     </FormControl>
                     <FormDescription className="text-sm text-muted-foreground">
@@ -146,12 +140,12 @@ const createRepo = api.project.createRepo.useMutation({
                         {...field}
                         disabled={isLoading}
                         type="password"
-                        className="h-12 text-base px-4 bg-background border-input"
+                        className="h-12 text-base px-4 bg-background border-input focus-visible:ring-purple-500"
                       />
                     </FormControl>
                     <FormDescription className="text-sm text-muted-foreground flex items-start gap-2">
-                      <div className="w-4 h-4 rounded-full bg-primary mt-0.5 flex-shrink-0">
-                        <span className="text-xs font-bold text-primary-foreground flex items-center justify-center h-full">i</span>
+                      <div className="w-4 h-4 rounded-full bg-purple-600 mt-0.5 flex-shrink-0">
+                        <span className="text-xs font-bold text-white flex items-center justify-center h-full">i</span>
                       </div>
                       <span>
                         Your GitHub personal access token for repository access. 
@@ -159,7 +153,7 @@ const createRepo = api.project.createRepo.useMutation({
                           href="https://github.com/settings/tokens" 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-[#764be5] hover:text-purple-700/80 underline ml-1 font-medium"
+                          className="text-purple-600 hover:text-purple-700 underline ml-1 font-medium"
                         >
                           Generate one here
                         </a>
@@ -170,7 +164,6 @@ const createRepo = api.project.createRepo.useMutation({
                 )}
               />
 
-              {/* Info Card - cleaner design */}
               <div className="bg-secondary/50 border border-border rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[#ca2a30] flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -185,29 +178,25 @@ const createRepo = api.project.createRepo.useMutation({
                 </div>
               </div>
 
-      <div className="flex justify-center pt-4">
-    <Button 
-      disabled={isLoading} 
-      type="submit"
-      className="h-12 px-8 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed border-0"
-    >
-      <Sparkles className="!w-5 !h-5 mr-1" />
-      {isLoading ? "Generating..." : "Generate Tutorial"}
-      
-    </Button>
-    {isLoading && 
-    <span className="mt-2">
-      This might take a few minutes...
-      </span>}
-</div>
-            
-
-              
+              <div className="flex flex-col items-center pt-4 gap-2">
+                <Button 
+                  disabled={isLoading} 
+                  type="submit"
+                  className="h-12 px-8 text-base font-medium bg-black hover:bg-gray-800 text-white rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed border-0"
+                >
+                  <Sparkles className="!w-5 !h-5 mr-1" />
+                  {isLoading ? "Generating..." : "Generate Tutorial"}
+                </Button>
+                {isLoading && 
+                  <span className="text-sm text-muted-foreground">
+                    This might take a few minutes...
+                  </span>
+                }
+              </div>
             </form>
           </Form>
         </div>
 
-        {/* Footer text - centered */}
         <p className="text-center text-sm text-muted-foreground mt-6">
           Secure and private. Your tokens are used only to access your repository.
         </p>

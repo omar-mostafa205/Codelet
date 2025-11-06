@@ -11,7 +11,7 @@ const embeddingModel = genAi.getGenerativeModel({
 });
 
 const codeAnalysisModel = genAi.getGenerativeModel({
-    model: 'gemma-3n-e4b-it',
+    model: 'gemini-2.5-pro',
     generationConfig: {
         temperature: 0.1,
         maxOutputTokens: 500,
@@ -45,7 +45,7 @@ export async function processRepositoryEmbeddings(
                 WHERE "id" = ${sourceCodeEmbedding.id};
             `;
             
-            console.log(`✓ Successfully processed: ${doc.metadata.source}`);
+            console.log(`Successfully processed: ${doc.metadata.source}`);
         } catch (error) {
             console.error(`✗ Failed to process: ${doc.metadata.source}`, error);
             throw error;

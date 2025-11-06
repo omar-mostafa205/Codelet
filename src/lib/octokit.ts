@@ -111,33 +111,20 @@ function calculateImportance(
     score += activity.changeCount * 10;
 
     if (isConfigFile(filePath)) score += 20;
-
     if (isEntryPoint(filePath)) score += 30;
-
     if (isCoreFile(filePath)) score += 25;
-
     score += activity.contributors.size * 5;
-
     score += Math.min(repoFile.content.split('\n').length / 10, 20);
-
     return score;
 }
-
-function isSourceCodeFile(filePath: string): boolean {
-    const codeExtensions = ['.js', '.ts', '.jsx', '.tsx', '.py', '.java', '.go', '.rs', '.php', '.rb'];
-    return codeExtensions.some(ext => filePath.endsWith(ext));
-}
-
 function isConfigFile(filePath: string): boolean {
     const configFiles = ['package.json', 'tsconfig.json', 'webpack.config', 'next.config', '.env'];
     return configFiles.some(config => filePath.includes(config));
 }
-
 function isEntryPoint(filePath: string): boolean {
     const entryPoints = ['index.', 'main.', 'app.', 'server.', 'index.html'];
     return entryPoints.some(entry => filePath.toLowerCase().includes(entry));
 }
-
 function isCoreFile(filePath: string): boolean {
     const coreNames = ['api', 'service', 'controller', 'model', 'util', 'helper', 'core', 'base'];
     return coreNames.some(core => filePath.toLowerCase().includes(core));

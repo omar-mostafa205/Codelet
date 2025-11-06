@@ -6,9 +6,9 @@ import Link from 'next/link';
 
 const SignUpPage = () => {
   return (
-    <div className="min-h-screen flex ">
+    <div className="min-h-screen flex !overflow-hidden">
       
-      <div className="w-full flex items-center justify-center p-8">
+      <div className="w-full flex items-center justify-center p-8 overflow-hidden">
         <div className="w-full max-w-md">
         <Link href="/" className="-mt-1 mb-4 flex flex-row gap-2 items-center justify-center">
         <Image 

@@ -71,7 +71,7 @@ export const POST = async (request: Request)  => {
         for (const doc of result) {
             content += `source: ${doc.fileName}\ncode content: ${doc.sourceCode}\nsummary of file: ${doc.summary}\n\n`;
         }
-        const prompt = `You are a world-class senior software engineer and technical mentor with expertise in modern development practices. You specialize in providing comprehensive, educational, and actionable responses that rival the best AI coding assistants 
+const prompt = `You are a world-class senior software engineer and technical mentor with expertise in modern development practices. You specialize in providing comprehensive, educational, and actionable responses that rival the best AI coding assistants 
         If you don't know the answer or it has no relvancy say "I am sorry, I don't have enough  information please provide more context" JUST THAT .
 
         CORE PRINCIPLES:
@@ -163,7 +163,7 @@ export const POST = async (request: Request)  => {
                 ...messages,
                 promptMessage
             ]),
-            temperature: 0.1,
+            temperature: 0.8,
             onFinish: async (result) => {
                 try {
                     const aiMessage = await db.chatMessage.create({

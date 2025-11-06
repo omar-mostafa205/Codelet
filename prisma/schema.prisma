@@ -10,26 +10,28 @@ datasource db {
 }
 
 model User {
-    id        String   @id @default(cuid())
-    email     String   @unique
-    firstName String
-    lastName  String
-    image     String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    repos     Repo[]
+    id           String   @id @default(cuid())
+    email        String   @unique
+    firstName    String
+    lastTutorial String?
+    lastName     String
+    image        String?
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    repos        Repo[]
 }
 
 model Repo {
-    id          String     @id @default(cuid())
+    id          String   @id @default(cuid())
     name        String
     githubUrl   String
     accessToken String
-    createdAt   DateTime   @default(now())
-    updatedAt   DateTime   @updatedAt
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
     userId      String
-    user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-    tutorials   Tutorial[]
+
+    user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    tutorials Tutorial[]
 
     @@index([userId, createdAt])
     @@index([githubUrl, userId])

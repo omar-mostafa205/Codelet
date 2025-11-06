@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { z } from "zod";
@@ -53,11 +52,6 @@ export const projectRouter = createTRPCRouter({
     })
   ).mutation(async ({ ctx, input }) => {
     try {
-      console.log("=== DEBUG INFO ===");
-      console.log("ctx.userId:", ctx.userId);
-      console.log("ctx.userId type:", ctx.userId);
-      console.log("==================");
-
       if (!ctx.userId) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
@@ -68,8 +62,6 @@ export const projectRouter = createTRPCRouter({
       const user = await ctx.db.user.findUnique({
         where: { id: ctx.userId }
       });
-
-      console.log("User lookup result:", user ? `Found: ${user.id}` : "Not found");
 
       if (!user) {
         throw new TRPCError({
@@ -89,7 +81,6 @@ export const projectRouter = createTRPCRouter({
 
       if (existingRepo) {
         repo = existingRepo;
-        console.log("Using existing repository:", repo.id);
       } else {
         const repoName = input.githubUrl.split('/').pop() || 'Unknown Repository';
         
@@ -101,16 +92,10 @@ export const projectRouter = createTRPCRouter({
             userId: ctx.userId,
           },
         });
-        console.log("Created new repository:", repo.id);
       }
 
-      console.log("Generating tutorial for:", input.githubUrl);
       const response = await generateTutorial(input.githubUrl, input.accessToken);
-      console.log("AI tutorial response received, validating structure...");
-
       const validatedTutorial = tutorialSchema.parse(response);
-      console.log("Tutorial validation successful");
-
       const tutorial = await ctx.db.tutorial.create({
         data: {
           title: validatedTutorial.title,
@@ -189,7 +174,6 @@ export const projectRouter = createTRPCRouter({
         });
       }
 
-      // Handle database errors
       if (error && typeof error === 'object' && 'code' in error) {
         if (error.code === 'P2002') {
           throw new TRPCError({
@@ -249,6 +233,98 @@ export const projectRouter = createTRPCRouter({
 
     return cachedRepos;
   }),
+getTutorialById: ProtectedProcedure
+  .input(z.object({ tutorialId: z.string() }))
+  .query(async ({ ctx, input }) => {
+    const tutorial = await ctx.db.tutorial.findUnique({
+      where: {
+        id: input.tutorialId,
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        createdAt: true,
+        updatedAt: true,
+        chapters: {
+          select: {
+            id: true,
+            title: true,
+            chapterNumber: true,
+            subChapters: {
+              select: {
+                id: true,
+                subChapterTitle: true,
+                diagram: true,
+                codeSnippets: {
+                  select: {
+                    id: true,
+                    language: true
+                  }
+                }
+              }
+            }
+          },
+          orderBy: {
+            chapterNumber: 'asc'
+          }
+        },
+        chatSessions: {
+          select: {
+            id: true,
+            title: true,
+            createdAt: true,
+            isActive: true,
+            messages: {
+              select: {
+                id: true,
+                content: true,
+                createdAt: true
+              },
+              orderBy: {
+                createdAt: 'desc'
+              },
+              take: 1
+            }
+          },
+          where: {
+            isActive: true
+          },
+          orderBy: {
+            updatedAt: 'desc'
+          }
+        }
+      }
+    });
+
+    if (!tutorial) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Tutorial not found',
+      });
+    }
+
+    return tutorial;
+  }),
+
+  getRepoById : ProtectedProcedure.input(
+    z.object({
+      repoId: z.string().min(1, "Repo ID is required"),
+    })
+  ).query(async ({ ctx, input }) => {
+    const repo = await ctx.db.repo.findFirst({
+      where: {
+        id: input.repoId,
+        userId: ctx.userId,
+      },
+      select: {
+        id: true,
+        name : true
+      },
+    });
+    return repo;
+  }), 
+
 getChapters: ProtectedProcedure.input(
   z.object({
     tutorialId: z.string().min(1, "Tutorial ID is required"),
@@ -345,18 +421,20 @@ getChatSessions: ProtectedProcedure.input(
   });
   return chatSessions;
 }),
-getLatestTutorial: ProtectedProcedure.query(async ({ ctx }) => {
-  const latestTutorial = await ctx.db.tutorial.findFirst({
+getLatestTutorials: ProtectedProcedure.input(z.object({
+  repoId : z.string().min(1, "Repo ID is required"),
+})).query(async ({ ctx , input}) => {
+  const latestTutorials = await ctx.db.tutorial.findMany({
     where: {
       repo: {
-        userId: ctx.userId,
+        id : input.repoId,
       },
     },
     orderBy: {
       createdAt: "desc",
     },
   });
-  return latestTutorial;
+  return latestTutorials;
 }),
 getChatMessages : ProtectedProcedure.input(
   z.object({

@@ -7,8 +7,13 @@ import { formatDistanceToNow } from 'date-fns';
 
 const REPO_COLORS = ['#FF6FD8', '#3813C2', '#FF6B35', '#FFB800', '#42B883', '#00ADD8', '#02569B'];
 
-export function getRepoColor(index: number): string {
-  return REPO_COLORS[index % REPO_COLORS.length];
+export function getRepoColor(repoId: string): string {
+  let hash = 0;
+  for (let i = 0; i < repoId.length; i++) {
+    hash = repoId.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % REPO_COLORS.length;
+  return REPO_COLORS[index] || '#000000'; 
 }
 
 export function calculateProgress(tutorials: any[]): number {
@@ -55,7 +60,7 @@ export function countDiagrams(chapters: any[]): number {
 }
 
 export function transformRepoData(reposData: any[]) {
-  return reposData.map((repo, index) => {
+  return reposData.map((repo) => {  // Remove index parameter
     const tutorials = repo.tutorials.map((tutorial: any) => {
       const diagrams = countDiagrams(tutorial.chapters);
       const status = determineTutorialStatus(tutorial);
@@ -71,7 +76,6 @@ export function transformRepoData(reposData: any[]) {
         views: 0, 
         description: tutorial.description,
         chatSessions: tutorial.chatSessions || []
-
       };
     });
 
@@ -81,7 +85,7 @@ export function transformRepoData(reposData: any[]) {
       chapters: repo.tutorials.reduce((sum: number, t: any) => sum + (t.chapters?.length || 0), 0),
       lastUpdated: getRelativeTime(new Date(repo.updatedAt)),
       progress: calculateProgress(repo.tutorials),
-      iconColor: getRepoColor(index),
+      iconColor: getRepoColor(repo.id),  // Use repo.id instead of index
       githubUrl: repo.githubUrl,
       description: `Repository: ${repo.name}`,
       stars: 0, 
@@ -89,7 +93,6 @@ export function transformRepoData(reposData: any[]) {
     };
   });
 }
-
 export function transformChatSessions(reposData: any[]) {
   const allChats: any[] = [];
   
@@ -98,11 +101,11 @@ export function transformChatSessions(reposData: any[]) {
       tutorial.chatSessions?.forEach((session: any) => {
         if (session.messages && session.messages.length > 0) {
           allChats.push({
-            id : session.id,
+            id: session.id,
             question: session.title || session.messages[0].content.substring(0, 50) + '...',
             time: getRelativeTime(new Date(session.createdAt)),
             repo: repo.name,
-            color: getRepoColor(reposData.indexOf(repo))
+            color: getRepoColor(repo.id) 
           });
         }
       });

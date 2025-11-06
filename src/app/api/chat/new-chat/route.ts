@@ -8,10 +8,6 @@ export const POST = async (request: Request) => {
   try {
     const body = await request.json()
     const tutorialId = body.tutorialId
-
-    console.log("Received tutorialId:", tutorialId)
-    console.log("Type:", typeof tutorialId)
-
     if (!tutorialId) {
       return NextResponse.json(
         { error: "tutorialId is required" },

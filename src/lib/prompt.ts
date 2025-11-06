@@ -1,23 +1,372 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-// Prompt generator
+
 export function createTutorialPrompt(data: any): string {
-  const prompt = `You are a Senior Software Engineer tasked with explaining a codebase to other developers. You will generate a comprehensive tutorial with 1 chapter only that is professional and focused don't explain basic concepts .
+  const repoName = data.repository?.name || "project";
+  const fileCount = data.importantFiles?.length || 0;
+  const hasAuth = data.importantFiles?.some((f: any) => 
+    f.path?.includes('auth') || f.reason?.toLowerCase().includes('auth')
+  );
+  const hasDatabase = data.importantFiles?.some((f: any) => 
+    f.path?.includes('db') || f.path?.includes('prisma') || f.path?.includes('schema')
+  );
+  
+  const recommendedChapters = fileCount < 15 ? '9-10' : fileCount < 30 ? '8-12' : '10-13';
 
-TUTORIAL REQUIREMENTS:
-- Each chapter should contain clear explanations of concepts
-- Include relevant code snippets when needed (optional but recommended)
-- Add diagrams when they help explain complex concepts (optional)
-- Focus heavily on practical code examples
-- Use proper markdown formatting for all code
-- PRIMARY FOCUS: Use 'importantFiles' from the ${data} as the main source for examples and explanations
+  const prompt = `You are a Senior Software Engineer creating an in-depth codebase tutorial for experienced developers joining the ${repoName} project.
 
-STRICT RESPONSE FORMAT:
-You must respond ONLY with a JSON object following this exact structure:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ CODEBASE ANALYSIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Project: ${repoName}
+Important Files Identified: ${fileCount}
+Has Authentication: ${hasAuth ? 'Yes' : 'No'}
+Has Database Layer: ${hasDatabase ? 'Yes' : 'No'}
+Recommended Chapters: ${recommendedChapters}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ YOUR MISSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create a comprehensive tutorial with ${recommendedChapters} chapters that explains the ARCHITECTURE and INTEGRATION PATTERNS of this codebase.
+
+Key Questions to Answer:
+✓ How do different layers of the application communicate?
+✓ What are the key architectural decisions and trade-offs?
+✓ How does data flow through the entire system?
+✓ What patterns are used for authentication, data fetching, and error handling?
+✓ How are external services integrated?
+✓ Which files orchestrate the critical business logic?
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 WHAT TO FOCUS ON (Priority Order)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. INTEGRATION POINTS (Highest Priority)
+   Focus on how different parts of the system connect and communicate.
+   
+   Look for patterns like:
+   • API route handler (server) ↔ fetch call (client) - Always show BOTH sides!
+   • Database query ↔ API endpoint that uses it
+   • Auth middleware ↔ protected route ↔ login component
+   • Server action ↔ client component that triggers it
+   • WebSocket server setup ↔ client connection code
+   • External API integration ↔ webhook handler
+   • Form submission ↔ validation ↔ API processing
+   • Event emitter ↔ event listeners across modules
+
+2. DATA FLOW & STATE MANAGEMENT
+   Trace how data moves through the application from start to finish.
+   
+   Look for patterns like:
+   • User clicks button → API call → database update → state refresh → UI update
+   • Server-side data fetch → hydration → client state management
+   • Redux/Zustand store setup → action creators → components that dispatch
+   • Context provider setup → consumer hooks → component usage
+   • Props drilling vs context vs global state
+   • Data transformations between layers (API → domain model → UI)
+   • Cache invalidation and refresh strategies
+
+3. AUTHENTICATION & AUTHORIZATION
+   Show the complete security flow and how access control works.
+   
+   Look for patterns like:
+   • Registration flow: form → validation → hashing → database → session
+   • Login form → auth API → JWT generation → session storage → redirect
+   • Protected route middleware → token validation → user context
+   • Password hashing in signup → verification in login
+   • Role-based access control implementation
+   • Session refresh and token rotation
+   • Logout and cleanup process
+
+4. DATABASE ARCHITECTURE
+   Explain data models, relationships, and how data is accessed.
+   
+   Look for patterns like:
+   • Schema definitions (Prisma, TypeORM, Mongoose, SQL) → generated types → usage
+   • Database migrations → schema changes → affected queries
+   • Relationships between models (one-to-many, many-to-many)
+   • Transaction handling in complex operations
+   • Connection pooling and optimization
+   • Query patterns and repository layer
+   • Indexes and performance considerations
+
+5. EXTERNAL INTEGRATIONS
+   Show how the app integrates with third-party services.
+   
+   Look for patterns like:
+   • Payment processing: client → server → Stripe API → webhook → confirmation
+   • Email service: trigger → template → sending → delivery confirmation
+   • File upload: client → server → S3/Cloudinary → URL storage → display
+   • Third-party OAuth: redirect → callback → token exchange → user creation
+   • API rate limiting and retry strategies
+   • Webhook handling and verification
+   • Background jobs for async operations
+
+6. BUSINESS LOGIC & WORKFLOWS
+   Explain core features and multi-step processes.
+   
+   Look for patterns like:
+   • Multi-step checkout process with state transitions
+   • Order fulfillment pipeline from creation to completion
+   • User onboarding flow with progress tracking
+   • Complex validation or calculation logic
+   • State machines for process management
+   • Scheduled tasks and cron jobs
+   • Error recovery and rollback procedures
+
+CHAPTER 1: GETTING STARTED (Required)
+├─ Sub-Chapter 1.1: "Repository Overview & Setup"
+│  ├─ explanation: What the codebase does, tech stack, how to run locally
+│  ├─ codeSnippets: package.json, .env.example, main config files
+│  └─ diagram: High-level architecture overview
+│
+└─ Sub-Chapter 1.2: "Project Structure & Conventions"
+   ├─ explanation: Folder organization, naming conventions, key directories
+   ├─ codeSnippets: Directory tree structure, example file paths
+   └─ diagram: Folder structure visualization
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHAPTER 2: INTEGRATION POINTS (Highest Priority)
+For each integration point, create a sub-chapter:
+
+Sub-Chapter Template:
+├─ subChapterTitle: "[Feature Name] - Client to Server Integration"
+├─ explanation: 
+│  • What triggers this integration (user action, cron job, webhook)
+│  • The complete flow from start to finish
+│  • Why it's designed this way
+│  • Common gotchas or edge cases
+│
+├─ codeSnippets: SHOW BOTH SIDES
+│  [
+│    { "fileRef": "client/components/Button.tsx", "sourceCode": "..." },
+│    { "fileRef": "server/api/endpoint.ts", "sourceCode": "..." }
+│  ]
+│
+└─ diagram: Sequence diagram showing the flow
+
+Examples of integration sub-chapters:
+- "User Login Flow - Frontend to Backend"
+- "API Data Fetching - Client Request to Database Response"
+- "Real-time Updates - WebSocket Connection"
+- "Payment Processing - Stripe Integration"
+- "File Upload - Client to Cloud Storage"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHAPTER 3: DATA FLOW & STATE MANAGEMENT
+For each major data flow, create a sub-chapter:
+
+Sub-Chapter Template:
+├─ subChapterTitle: "[Data Flow Name]"
+├─ explanation:
+│  • Where data originates
+│  • How it transforms through the system
+│  • Where it's stored (memory, DB, cache, local storage)
+│  • How components react to changes
+│
+├─ codeSnippets: Show the complete chain
+│  • Initial fetch/mutation
+│  • State management setup (Redux, Context, Zustand, etc.)
+│  • Component that consumes the data
+│
+└─ diagram: Data flow diagram
+
+Examples:
+- "User Data - From Login to Global State"
+- "Shopping Cart - Add Item to Checkout Flow"
+- "Real-time Notifications - Server Push to UI Update"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHAPTER 4: AUTHENTICATION & AUTHORIZATION
+Sub-chapters to include:
+
+4.1 "User Registration & Login Flow"
+├─ explanation: Complete auth flow, token generation, session management
+├─ codeSnippets: 
+│  • Signup form component
+│  • Auth API endpoints
+│  • JWT/session handling
+│  • Password hashing
+└─ diagram: Authentication sequence diagram
+
+4.2 "Protected Routes & Authorization"
+├─ explanation: How routes are protected, role checking, permissions
+├─ codeSnippets:
+│  • Middleware implementation
+│  • Route guards
+│  • Permission checking utilities
+└─ diagram: Authorization decision flow
+
+4.3 "Session Management & Token Refresh"
+├─ explanation: Token lifecycle, refresh strategies, logout
+├─ codeSnippets: Token refresh logic, interceptors
+└─ diagram: Token refresh flow
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHAPTER 5: DATABASE ARCHITECTURE(Diagrams are MANDATORY in this chapter)
+Sub-chapters to include:
+
+5.1 "Database Schema & Models"
+├─ explanation: Tables/collections, relationships, constraints
+├─ codeSnippets: 
+│  • Schema definitions (Prisma, TypeORM, Mongoose, SQL)
+│  • Migration files
+└─ diagram: Entity relationship diagram (ERD)
+
+5.2 "Query Patterns & Data Access Layer"
+├─ explanation: How data is queried, common patterns, optimizations
+├─ codeSnippets:
+│  • Repository/service layer code
+│  • Complex queries
+│  • Transaction examples
+└─ diagram: Data access layer architecture
+
+5.3 "Database Operations in API Routes"
+├─ explanation: How API endpoints interact with the database
+├─ codeSnippets: Complete CRUD examples with error handling
+└─ diagram: API → DB flow
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHAPTER 6: EXTERNAL INTEGRATIONS
+For each external service, create a sub-chapter:
+
+Sub-Chapter Template:
+├─ subChapterTitle: "[Service Name] Integration"
+├─ explanation:
+│  • What the integration does
+│  • Configuration & API keys setup
+│  • Request/response flow
+│  • Webhook handling (if applicable)
+│  • Error handling & retries
+│
+├─ codeSnippets:
+│  • Client-side trigger code
+│  • Server-side API call
+│  • Webhook handler (if exists)
+│  • Configuration files
+│
+└─ diagram: Complete integration flow including webhooks
+
+Examples:
+- "Stripe Payment Processing"
+- "SendGrid Email Service"
+- "AWS S3 File Storage"
+- "OAuth with Google/GitHub"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHAPTER 7: BUSINESS LOGIC & WORKFLOWS
+For each major workflow, create a sub-chapter:
+
+Sub-Chapter Template:
+├─ subChapterTitle: "[Workflow Name] Process"
+├─ explanation:
+│  • Step-by-step breakdown of the workflow
+│  • Business rules and validation
+│  • State transitions
+│  • Error scenarios and recovery
+│
+├─ codeSnippets:
+│  • Main workflow orchestration code
+│  • Validation functions
+│  • State machine logic (if applicable)
+│
+└─ diagram: Workflow state diagram or process flow
+
+Examples:
+- "E-commerce Checkout Process"
+- "User Onboarding Journey"
+- "Order Fulfillment Pipeline"
+- "Content Publishing Workflow"
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚫 WHAT TO AVOID
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✗ Basic language syntax or framework tutorials ("What is useState?")
+✗ CSS, styling, Tailwind classes, or UI design details
+✗ Simple utility functions that don't demonstrate patterns
+✗ Line-by-line code walkthroughs
+✗ Obvious, self-documenting code explanations
+✗ Generic "Hello World" examples - use REAL code from the codebase
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📐 STRUCTURE REQUIREMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Chapters: ${recommendedChapters} chapters total
+
+SubChapters per Chapter:
+  • Standard chapters: 3-4 subchapters
+  • Complex/Important chapters (auth, data flow, integrations): 5-10 subchapters
+
+Suggested Chapter Flow:
+  1. Architecture Overview & Project Structure
+  2. Core Integration Patterns (API, Database, State)
+  3. Authentication & Authorization System
+  4. Data Layer & Database Operations
+  5. External Service Integrations
+  6. Business Logic & Critical Workflows
+  7. Configuration & Deployment (if relevant)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💎 CONTENT QUALITY GUIDELINES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Code Snippets (IS Mandatory for Every Explaination):
+  • Show BOTH sides of integrations (e.g., API route + client fetch)
+  • Include when illustrating patterns, not just showing code
+  • Simplify and focus on the important parts with comments
+  • Use actual file paths from importantFiles in fileRef
+
+Diagrams (OPTIONAL):
+  • Use for complex flows that words can't easily explain
+  • Sequence diagrams for API interactions
+  • Flowcharts for user journeys and multi-step processes
+  • ER diagrams for database relationships
+  • Keep them focused and simple
+
+Explanations:
+  • Lead with "WHY" before "WHAT" - explain architectural decisions
+  • Show trade-offs: "We chose X over Y because..."
+  • Connect to real developer scenarios: "When you need to add a new endpoint..."
+  • Assume intermediate knowledge - don't explain basic concepts
+  • Be concise but thorough
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ CRITICAL RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ✓ USE IMPORTANTFILES: The 'importantFiles' array below is your PRIMARY source
+2. ✓ VALIDATE: Every chapter must reference at least ONE file from importantFiles
+3. ✓ SHOW CONNECTIONS: When explaining a feature, show ALL related files (client + server)
+4. ✓ CODE FORMAT: Use \\n for newlines in sourceCode strings (JSON requirement)
+5. ✓ DIAGRAM FORMAT: Wrap mermaid in \`\`\`mermaid....\`\`\` markdown blocks
+6. ✓ FILE PATHS: Use exact paths from importantFiles in fileRef
+7. ✓ JSON ONLY: Output must be VALID JSON with no extra text before or after
+8. ✓ MANDATORY: Include at least 1 code snippet per chapter (not per subchapter)
+9. ✓ OPTIONAL: Diagrams are encouraged but not required for every subchapter
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 REQUIRED JSON OUTPUT FORMAT (DO NOT CHANGE THIS STRUCTURE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 {
   "title": "Tutorial Title Here",
   "description": "Brief description of what this tutorial covers",
-  "repository": "${data.repository?.name || "project"}",
+  "repository": "${repoName}",
   "chapters": [
     {
       "chapterNumber": 1,
@@ -26,7 +375,7 @@ You must respond ONLY with a JSON object following this exact structure:
         "subChapters": [
           {
             "subChapterTitle": "Sub Chapter Title",
-            "explanation": "Detailed explanation of the concept covered in this section",
+            "explanation": "Detailed explanation using **markdown** formatting with \`inline code\`, headers, and lists",
             "codeSnippets": [
               {
                 "fileRef": "path/to/file.js",
@@ -41,580 +390,29 @@ You must respond ONLY with a JSON object following this exact structure:
   ]
 }
 
-IMPORTANT RULES:
-1. Code snippets are OPTIONAL - only include when they add value
-2. Diagrams are OPTIONAL - only include when they clarify complex concepts
-3. All code must be properly formatted with syntax highlighting
-4. Focus on practical, real-world examples
-5. Each chapter should build upon previous knowledge
-6. Keep explanations clear and concise
-7. Target audience: experienced developers learning a new codebase
-
 FORMATTING EXAMPLES:
 
-For Code Snippets (will be rendered with SyntaxHighlighter):
+Code Snippet Format:
 "sourceCode": "import React from 'react';\\nconst Component = () => {\\n  return <div>Hello World</div>;\\n};"
 
-For Diagrams (will be rendered with Mermaid via ReactMarkdown):
-"diagram": "` + '```mermaid\\nflowchart LR\\n    A[Start] --> B[End]\\n```' + `"
+Diagram Format:
+"diagram": "` + '```mermaid\\nsequenceDiagram\\n    Client->>API: POST /login\\n    API-->>Client: JWT token\\n```' + `"
 
-Common Mermaid Diagram Types to Use:
-- Flowchart: Use for process flows and user journeys
-- Sequence: Use for API calls and component interactions  
-- Class: Use for object relationships and inheritance
-- ER: Use for database relationships
-- Git Graph: Use for branching strategies
+Common Mermaid Diagram Types:
+- flowchart: Process flows and user journeys
+- sequenceDiagram: API calls and component interactions  
+- classDiagram: Object relationships and inheritance
+- erDiagram: Database relationships
 
-Generate the tutorial based on the provided codebase data: ${JSON.stringify(data, null, 2)}`;
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 CODEBASE DATA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${JSON.stringify(data, null, 2)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Begin generating the tutorial now. Output ONLY the JSON object with no additional text.`;
 
   return prompt;
 }
-
-
-  // "chapter_2": {
-  //   "title": "System Architecture & Technical Design",
-  //   "chapter": 2,
-  //   "overview": "Comprehensive examination of the system architecture, design patterns, technical decisions, and component interactions.",
-  //   "prerequisites": ["Basic understanding of system design", "Familiarity with architectural patterns", "Database fundamentals"],
-  //   "learningObjectives": [
-  //     "Understand the overall system architecture and design philosophy",
-  //     "Identify all major components and their responsibilities",
-  //     "Trace request flows and data paths through the system",
-  //     "Understand scalability, performance, and fault tolerance patterns",
-  //     "Recognize design patterns and architectural decisions"
-  //   ],
-  //   "architecturalPatterns": [
-  //     {
-  //       "pattern": "Primary architectural pattern (e.g., Microservices, Monolith, etc.)",
-  //       "rationale": "Why this pattern was chosen for this specific project",
-  //       "benefits": ["Benefit 1", "Benefit 2", "Benefit 3"],
-  //       "tradeoffs": ["Tradeoff 1", "Tradeoff 2"]
-  //     }
-  //   ],
-  //   "systemComponents": [
-  //     {
-  //       "name": "Component name",
-  //       "purpose": "What this component does and why it exists",
-  //       "technology": "Tech stack used for this component",
-  //       "connections": ["Other components it connects to"],
-  //       "responsibilities": ["Primary responsibility 1", "Primary responsibility 2"],
-  //       "scalabilityConsiderations": "How this component scales"
-  //     }
-  //   ],
-  //   "dataFlow": [
-  //     {
-  //       "step": 1,
-  //       "actor": "Who initiates this step",
-  //       "action": "What action is performed",
-  //       "data": "What data is involved",
-  //       "destination": "Where the data goes next",
-  //       "transformations": "How data is modified in this step"
-  //     }
-  //   ],
-  //   "performanceCharacteristics": [
-  //     {
-  //       "metric": "Performance metric name",
-  //       "currentValue": "Current measured performance",
-  //       "targetValue": "Target performance goal",
-  //       "importance": "critical/important/nice-to-have",
-  //       "measurementMethod": "How this metric is measured"
-  //     }
-  //   ],
-  //   "diagrams": [
-  //     {
-  //       "type": "mermaid",
-  //       "title": "System Architecture Overview",
-  //       "description": "Complete architecture diagram showing all major components and their interactions",
-  //       "diagram": "Comprehensive mermaid diagram showing system architecture",
-  //       "size": "large",
-  //       "interactive": true,
-  //       "clickableElements": [
-  //         {
-  //           "elementId": "component_id",
-  //           "description": "What happens when this element is clicked",
-  //           "action": "Action to perform"
-  //         }
-  //       ]
-  //     }
-  //   ],
-  //   "designDecisions": [
-  //     {
-  //       "decision": "Major technical decision made",
-  //       "rationale": "Why this decision was made",
-  //       "alternatives": ["Alternative option 1", "Alternative option 2"],
-  //       "consequences": ["Positive consequence", "Negative consequence"],
-  //       "reviewDate": "When this decision should be reviewed"
-  //     }
-  //   ],
-  //   "bestPractices": [
-  //     {
-  //       "title": "Best practice name",
-  //       "description": "Detailed description of the practice",
-  //       "applicableScenarios": ["When to apply this practice"],
-  //       "benefits": ["Benefit 1", "Benefit 2"],
-  //       "implementationEffort": "low/medium/high",
-  //       "examples": ["Concrete example of implementation"]
-  //     }
-  //   ]
-  // },
-  // "chapter_3": {
-  //   "title": "Technology Stack & Development Environment",
-  //   "chapter": 3,
-  //   "overview": "Complete guide to the technology stack, dependencies, development tools, and environment setup process.",
-  //   "learningObjectives": [
-  //     "Understand the rationale behind each technology choice",
-  //     "Set up a complete development environment from scratch",
-  //     "Configure all necessary tools and dependencies",
-  //     "Understand version compatibility and upgrade paths",
-  //     "Troubleshoot common setup and configuration issues"
-  //   ],
-  //   "technologyChoices": [
-  //     {
-  //       "category": "Frontend/Backend/Database/etc.",
-  //       "technology": "Specific technology name",
-  //       "version": "Version being used",
-  //       "purpose": "Why this technology is used",
-  //       "alternatives": ["Alternative options considered"],
-  //       "migrationPath": "How to upgrade or migrate if needed"
-  //     }
-  //   ],
-  //   "systemRequirements": {
-  //     "os": ["Supported operating systems"],
-  //     "nodeVersion": "Required Node.js version",
-  //     "memory": "RAM requirements",
-  //     "storage": "Storage requirements",
-  //     "additionalTools": ["Docker", "Database", "etc."]
-  //   },
-  //   "installationSteps": [
-  //     {
-  //       "step": 1,
-  //       "title": "Step title",
-  //       "commands": ["Command 1", "Command 2"],
-  //       "description": "Detailed description of what this step accomplishes",
-  //       "platform": "all/windows/mac/linux",
-  //       "troubleshooting": ["Common issue 1", "Common issue 2"],
-  //       "verification": "How to verify this step completed successfully"
-  //     }
-  //   ],
-  //   "configurations": [
-  //     {
-  //       "filename": "Configuration file name",
-  //       "purpose": "What this configuration file controls",
-  //       "content": "Example configuration content",
-  //       "format": "File format (json/yaml/env/etc.)",
-  //       "environment": "development/staging/production/all",
-  //       "containsSecrets": false,
-  //       "setupInstructions": ["Step 1", "Step 2", "Step 3"],
-  //       "commonIssues": ["Issue 1", "Issue 2"]
-  //     }
-  //   ],
-  //   "developmentTools": [
-  //     {
-  //       "tool": "Tool name",
-  //       "purpose": "What this tool is used for",
-  //       "installation": "How to install",
-  //       "configuration": "Key configuration settings",
-  //       "alternatives": ["Alternative tools"]
-  //     }
-  //   ],
-  //   "folderStructure": {
-  //     "overview": "High-level explanation of project organization",
-  //     "structure": "Detailed folder structure with explanations",
-  //     "conventions": ["Naming convention 1", "Organization principle 1"],
-  //     "navigation": ["How to find common file types", "Where to add new features"]
-  //   }
-  // },
-  // "chapter_4": {
-  //   "title": "Data Architecture & State Management",
-  //   "chapter": 4,
-  //   "overview": "Comprehensive guide to data models, database design, state management patterns, and data flow throughout the system.",
-  //   "learningObjectives": [
-  //     "Understand the complete data model and relationships",
-  //     "Work effectively with the database schema and ORM",
-  //     "Implement proper state management patterns",
-  //     "Trace data flow from UI to database and back",
-  //     "Optimize data access and caching strategies"
-  //   ],
-  //   "dataModel": {
-  //     "entities": [
-  //       {
-  //         "name": "Entity name",
-  //         "purpose": "What this entity represents",
-  //         "attributes": ["key attribute 1", "key attribute 2"],
-  //         "relationships": ["Related entity 1", "Related entity 2"],
-  //         "constraints": ["Business rule 1", "Data constraint 1"]
-  //       }
-  //     ],
-  //     "relationships": "Description of how entities relate to each other",
-  //     "designPrinciples": ["Normalization approach", "Performance considerations"]
-  //   },
-  //   "stateManagement": {
-  //     "patterns": [
-  //       {
-  //         "pattern": "State management pattern name",
-  //         "useCase": "When to use this pattern",
-  //         "implementation": "How it's implemented in the project",
-  //         "benefits": ["Benefit 1", "Benefit 2"],
-  //         "considerations": ["Thing to watch out for 1"]
-  //       }
-  //     ],
-  //     "dataFlow": "How data moves through different layers of the application"
-  //   },
-  //   "caching": {
-  //     "strategy": "Overall caching approach",
-  //     "layers": ["Cache layer 1", "Cache layer 2"],
-  //     "invalidation": "How cache is kept consistent",
-  //     "performance": "Performance impact and metrics"
-  //   },
-  //   "diagrams": [
-  //     {
-  //       "type": "mermaid",
-  //       "title": "Data Flow Diagram",
-  //       "description": "Shows how data moves through the system",
-  //       "diagram": "Mermaid diagram showing complete data flow",
-  //       "size": "large"
-  //     }
-  //   ],
-  //   "bestPractices": [
-  //     {
-  //       "title": "Data handling best practice",
-  //       "description": "Detailed explanation of the practice",
-  //       "examples": ["Code example or scenario"],
-  //       "commonMistakes": ["Mistake to avoid 1"]
-  //     }
-  //   ]
-  // },
-  // "chapter_5": {
-  //   "title": "Authentication, Authorization & Security",
-  //   "chapter": 5,
-  //   "overview": "Complete security implementation guide covering authentication mechanisms, authorization rules, and security best practices.",
-  //   "learningObjectives": [
-  //     "Implement secure authentication flows",
-  //     "Design and enforce authorization rules",
-  //     "Handle security tokens and sessions properly",
-  //     "Apply security best practices throughout the application",
-  //     "Identify and mitigate common security vulnerabilities"
-  //   ],
-  //   "authenticationMethods": [
-  //     {
-  //       "method": "Authentication method name (JWT, OAuth, etc.)",
-  //       "implementation": "How it's implemented in the project",
-  //       "flow": "Step-by-step authentication flow",
-  //       "tokenHandling": "How tokens are created, stored, and validated",
-  //       "expiration": "Token lifecycle and refresh strategy"
-  //     }
-  //   ],
-  //   "authorizationRules": [
-  //     {
-  //       "resource": "Protected resource",
-  //       "roles": ["Role 1", "Role 2"],
-  //       "permissions": ["Permission 1", "Permission 2"],
-  //       "implementation": "How authorization is enforced",
-  //       "edgeCases": ["Special case 1", "Exception 1"]
-  //     }
-  //   ],
-  //   "securityMeasures": [
-  //     {
-  //       "measure": "Security measure name",
-  //       "purpose": "What threat this protects against",
-  //       "implementation": "How it's implemented",
-  //       "configuration": "Key configuration settings",
-  //       "testing": "How to verify it works"
-  //     }
-  //   ],
-  //   "commonVulnerabilities": [
-  //     {
-  //       "vulnerability": "OWASP Top 10 item or common security issue",
-  //       "description": "What this vulnerability is",
-  //       "prevention": "How the project prevents this",
-  //       "detection": "How to detect if this occurs",
-  //       "mitigation": "What to do if this is found"
-  //     }
-  //   ]
-  // },
-  // "chapter_6": {
-  //   "title": "API Design & Backend Implementation",
-  //   "chapter": 6,
-  //   "overview": "Comprehensive guide to API architecture, endpoint design, business logic implementation, and backend patterns.",
-  //   "learningObjectives": [
-  //     "Understand API design principles and patterns used",
-  //     "Implement clean, maintainable backend code",
-  //     "Handle errors, validation, and edge cases properly",
-  //     "Write effective business logic and service layers",
-  //     "Follow established coding standards and patterns"
-  //   ],
-  //   "apiDesign": {
-  //     "principles": ["REST principles", "Design philosophy", "Consistency rules"],
-  //     "patterns": [
-  //       {
-  //         "pattern": "API pattern name",
-  //         "usage": "When this pattern is used",
-  //         "implementation": "How it's implemented",
-  //         "benefits": ["Benefit 1", "Benefit 2"]
-  //       }
-  //     ],
-  //     "versioning": "API versioning strategy",
-  //     "documentation": "How APIs are documented"
-  //   },
-  //   "endpointStructure": [
-  //     {
-  //       "endpoint": "/api/resource/{id}",
-  //       "method": "GET/POST/PUT/DELETE",
-  //       "purpose": "What this endpoint does",
-  //       "parameters": ["Parameter 1", "Parameter 2"],
-  //       "validation": "Input validation rules",
-  //       "response": "Response format and status codes",
-  //       "errorHandling": "How errors are handled"
-  //     }
-  //   ],
-  //   "businessLogic": {
-  //     "organization": "How business logic is organized",
-  //     "patterns": ["Service layer", "Repository pattern", "etc."],
-  //     "validation": "Business rule validation approach",
-  //     "errorHandling": "How business errors are handled"
-  //   },
-  //   "codeSnippets": [
-  //     {
-  //       "filename": "Example controller or service file",
-  //       "language": "javascript/typescript/etc.",
-  //       "code": "Well-documented code example showing patterns",
-  //       "explanation": "Explanation of the code and patterns used"
-  //     }
-  //   ]
-  // },
-  // "chapter_7": {
-  //   "title": "Frontend Architecture & User Interface",
-  //   "chapter": 7,
-  //   "overview": "Complete guide to frontend architecture, component design patterns, state management, and user interface implementation.",
-  //   "learningObjectives": [
-  //     "Understand frontend architecture and component organization",
-  //     "Implement reusable, maintainable UI components",
-  //     "Handle frontend state management effectively",
-  //     "Create responsive and accessible user interfaces",
-  //     "Optimize frontend performance and user experience"
-  //   ],
-  //   "architecturePattern": {
-  //     "pattern": "Frontend architecture pattern (Component-based, MVC, etc.)",
-  //     "rationale": "Why this pattern was chosen",
-  //     "structure": "How the frontend is organized",
-  //     "dataFlow": "How data flows through the frontend"
-  //   },
-  //   "componentDesign": [
-  //     {
-  //       "componentType": "Component category (Layout, Form, Data, etc.)",
-  //       "patterns": ["Pattern 1", "Pattern 2"],
-  //       "reusability": "How components are made reusable",
-  //       "props": "Common prop patterns",
-  //       "state": "State management within components"
-  //     }
-  //   ],
-  //   "stateManagement": {
-  //     "approach": "Frontend state management approach",
-  //     "tools": ["State management tool 1", "Tool 2"],
-  //     "patterns": ["Global state", "Local state", "Server state"],
-  //     "dataFlow": "How state changes propagate"
-  //   },
-  //   "userExperience": {
-  //     "designSystem": "Design system or style guide used",
-  //     "accessibility": "Accessibility standards and implementation",
-  //     "responsiveness": "Responsive design approach",
-  //     "performance": "Frontend performance optimizations"
-  //   },
-  //   "codeSnippets": [
-  //     {
-  //       "filename": "Example component file",
-  //       "language": "jsx/tsx",
-  //       "code": "Well-structured component example",
-  //       "explanation": "Component patterns and best practices shown"
-  //     }
-  //   ]
-  // },
-  // "chapter_8": {
-  //   "title": "Testing Strategy & Quality Assurance",
-  //   "chapter": 8,
-  //   "overview": "Comprehensive testing approach covering unit tests, integration tests, end-to-end testing, and quality assurance processes.",
-  //   "learningObjectives": [
-  //     "Understand the complete testing strategy and pyramid",
-  //     "Write effective unit and integration tests",
-  //     "Implement end-to-end testing scenarios",
-  //     "Set up continuous testing and quality gates",
-  //     "Debug and troubleshoot test failures effectively"
-  //   ],
-  //   "testingStrategy": {
-  //     "philosophy": "Overall testing philosophy and approach",
-  //     "pyramid": "Testing pyramid breakdown (unit/integration/e2e ratios)",
-  //     "coverage": "Code coverage goals and measurement",
-  //     "automation": "Test automation strategy"
-  //   },
-  //   "testTypes": [
-  //     {
-  //       "type": "Unit/Integration/E2E/Performance",
-  //       "purpose": "What this test type validates",
-  //       "tools": ["Testing tool 1", "Tool 2"],
-  //       "patterns": ["Common test patterns used"],
-  //       "coverage": "What percentage of code/features",
-  //       "frequency": "How often these tests run"
-  //     }
-  //   ],
-  //   "qualityGates": [
-  //     {
-  //       "gate": "Quality gate name",
-  //       "criteria": ["Criterion 1", "Criterion 2"],
-  //       "tools": ["Tool used to measure"],
-  //       "threshold": "Pass/fail threshold",
-  //       "action": "What happens if gate fails"
-  //     }
-  //   ],
-  //   "testEnvironments": [
-  //     {
-  //       "environment": "Environment name",
-  //       "purpose": "What this environment is used for",
-  //       "data": "Test data strategy",
-  //       "setup": "How to set up this environment",
-  //       "maintenance": "How this environment is maintained"
-  //     }
-  //   ],
-  //   "commonIssues": [
-  //     {
-  //       "issue": "Common testing issue",
-  //       "cause": "Why this issue occurs",
-  //       "solution": "How to resolve it",
-  //       "prevention": "How to prevent it"
-  //     }
-  //   ]
-  // },
-  // "chapter_9": {
-  //   "title": "Deployment, CI/CD & DevOps",
-  //   "chapter": 9,
-  //   "overview": "Complete guide to deployment processes, CI/CD pipelines, infrastructure management, and DevOps practices.",
-  //   "learningObjectives": [
-  //     "Understand the deployment architecture and environments",
-  //     "Work with CI/CD pipelines and automation",
-  //     "Deploy applications safely and efficiently",
-  //     "Monitor and maintain production systems",
-  //     "Handle incidents and troubleshoot deployment issues"
-  //   ],
-  //   "deploymentArchitecture": {
-  //     "environments": [
-  //       {
-  //         "name": "Environment name (dev/staging/prod)",
-  //         "purpose": "What this environment is used for",
-  //         "infrastructure": "Infrastructure setup",
-  //         "configuration": "Key configuration differences",
-  //         "access": "Who has access and how"
-  //       }
-  //     ],
-  //     "strategy": "Blue-green, rolling, canary, etc.",
-  //     "infrastructure": "Infrastructure as code approach"
-  //   },
-  //   "cicdPipeline": {
-  //     "stages": [
-  //       {
-  //         "stage": "Pipeline stage name",
-  //         "purpose": "What this stage accomplishes",
-  //         "tools": ["Tool 1", "Tool 2"],
-  //         "duration": "Typical execution time",
-  //         "failureHandling": "What happens if this stage fails"
-  //       }
-  //     ],
-  //     "triggers": "What triggers pipeline execution",
-  //     "approvals": "Manual approval gates",
-  //     "notifications": "How team is notified of pipeline status"
-  //   },
-  //   "monitoring": {
-  //     "metrics": ["Key metric 1", "Key metric 2"],
-  //     "alerting": "Alert setup and escalation",
-  //     "logging": "Log aggregation and analysis",
-  //     "dashboards": "Monitoring dashboards available"
-  //   },
-  //   "troubleshooting": [
-  //     {
-  //       "scenario": "Common deployment issue",
-  //       "symptoms": "How to identify this issue",
-  //       "diagnosis": "How to diagnose the root cause",
-  //       "resolution": "Steps to resolve",
-  //       "prevention": "How to prevent recurrence"
-  //     }
-  //   ]
-  // },
-  // "chapter_10": {
-  //   "title": "Development Workflow & Team Onboarding",
-  //   "chapter": 10,
-  //   "overview": "Complete guide to team workflows, development processes, common pitfalls, and structured onboarding for new team members.",
-  //   "learningObjectives": [
-  //     "Understand team development workflows and processes",
-  //     "Avoid common mistakes and pitfalls",
-  //     "Follow established coding standards and practices",
-  //     "Complete structured onboarding as a new team member",
-  //     "Contribute effectively to the team and codebase"
-  //   ],
-  //   "developmentWorkflow": {
-  //     "gitWorkflow": "Git branching strategy and workflow",
-  //     "codeReview": "Code review process and standards",
-  //     "issueTracking": "How issues and features are tracked",
-  //     "communication": "Team communication channels and practices"
-  //   },
-  //   "codingStandards": [
-  //     {
-  //       "category": "Code style/Architecture/Documentation/etc.",
-  //       "standards": ["Standard 1", "Standard 2"],
-  //       "tools": ["Linting tool", "Formatting tool"],
-  //       "enforcement": "How standards are enforced",
-  //       "exceptions": "When standards can be bent"
-  //     }
-  //   ],
-  //   "commonPitfalls": [
-  //     {
-  //       "pitfall": "Common mistake or gotcha",
-  //       "description": "What this pitfall is",
-  //       "consequences": "What happens if you fall into this",
-  //       "prevention": "How to avoid this pitfall",
-  //       "detection": "How to detect if this has happened",
-  //       "resolution": "How to fix it if it occurs"
-  //     }
-  //   ],
-  //   "onboardingPlan": {
-  //     "duration": "30 days",
-  //     "phases": [
-  //       {
-  //         "phase": "Phase name (Week 1, Week 2, etc.)",
-  //         "duration": "1 week",
-  //         "goals": ["Goal 1", "Goal 2"],
-  //         "tasks": [
-  //           {
-  //             "task": "Specific task to complete",
-  //             "description": "Detailed description of the task",
-  //             "priority": "critical/important/nice-to-have",
-  //             "estimatedEffort": "hours/days",
-  //             "complexity": "simple/medium/complex",
-  //             "prerequisites": ["Prerequisite 1"],
-  //             "deliverables": ["What should be produced"],
-  //             "mentor": "Who to work with on this task"
-  //           }
-  //         ],
-  //         "checkpoints": ["Checkpoint 1", "Checkpoint 2"],
-  //         "resources": ["Resource 1", "Resource 2"]
-  //       }
-  //     ],
-  //     "milestones": [
-  //       {
-  //         "milestone": "First successful deployment",
-  //         "description": "What this milestone represents",
-  //         "criteria": "How to know this is achieved",
-  //         "celebration": "How achievement is recognized"
-  //       }
-  //     ]
-  //   },
-  //   "resources": {
-  //     "documentation": ["Doc link 1", "Doc link 2"],
-  //     "tools": ["Tool 1", "Tool 2"],
-  //     "contacts": ["Key contact 1", "Key contact 2"],
-  //     "training": ["Training resource 1", "Training resource 2"]
-  //   },
-  //   "feedback": {
-  //     "schedule": "Regular feedback schedule",
-  //     "format": "How feedback is given and received",
-  //     "topics": ["Performance", "Technical growth", "Team fit"],
-  //     "action": "How feedback leads to improvement"
-  //   }
-  // }
