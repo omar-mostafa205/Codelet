@@ -206,6 +206,7 @@ function TutorialDashboardContent() {
   );
 }
 
+// Main component that wraps with Suspense
 export default function TutorialDashboard() {
   return (
     <Suspense fallback={<LoadingSkeleton />}>
