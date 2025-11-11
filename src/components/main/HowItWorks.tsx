@@ -31,18 +31,11 @@ export default function ThreeStepProcess() {
           
           <div className="relative min-h-[400px] lg:min-h-0 rounded-2xl">
             <Image 
-              src="/bgcolored.png" 
+              src="/img.png" 
               alt="Background" 
               width={700}
               height={700}
-              className="absolute inset-0 w-[100%] h-[90%] rounded-2xl"
-            />
-            <Image 
-              src="/rocket.png" 
-              alt="Team collaboration"
-              width={700}
-              height={700}
-              className="relative w-[40%] h-[92%] ml-45 "
+              className=" w-[100%] h-[90%] rounded-2xl"
             />
           </div>
         </div>
