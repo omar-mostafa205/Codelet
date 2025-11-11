@@ -37,8 +37,9 @@ export default function TestimonialsSection() {
   };
 
   return (
+    <div className="bg-[#f8fafc] min-h-screen w-[97vw] mx-auto py-30">
     <div 
-      className="min-h-screen w-[97vw] flex flex-col items-center justify-center px-5 py-16 relative mx-auto rounded-2xl"
+      className=" flex flex-col items-center justify-center px-5 py-26 mt-0  sm:pt-20 relative mx-auto rounded-2xl bg-[#f8fafc]"
       style={{
         backgroundImage: 'url(/bg.png)',
         backgroundSize: 'cover',
@@ -114,7 +115,6 @@ export default function TestimonialsSection() {
         </div>
       </div>
 
-      {/* Company Logos */}
       <section className="bg-transparent py-16">
             <div className="mx-auto max-w-5xl px-6">
                 <h2 className="text-center text-4xl font-semibold -mb-10">Devlopers from these companies use Codelet</h2>
@@ -135,6 +135,7 @@ export default function TestimonialsSection() {
         </section>
     
  
+    </div>
     </div>
   );
 }

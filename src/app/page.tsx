@@ -23,8 +23,8 @@ const HomePage = () => {
         className="
         relative w-[98vw] mx-auto mt-24 mb-8
         flex items-center justify-center
-        rounded-2xl z-10 bg-white overflow-hidden
-        min-h-[50vh] sm:min-h-[100vh] lg:min-h-[140vh]
+        rounded-2xl z-10 bg-[#f8fafc] overflow-hidden
+        min-h-[50vh] md:min-h-[100vh] lg:min-h-[140vh]
         pb-20 sm:pb-32 lg:pb-48
       "
       >
@@ -43,7 +43,7 @@ const HomePage = () => {
           <p className="text-black text-lg sm:text-xl md:text-2xl drop-shadow-2xl text-center px-4 sm:px-2">
             The fastest way to understand any codebase, built to ramp devs in days, not months.
           </p>
-                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-7 mt-7 px-4 w-full sm:w-auto max-w-md sm:max-w-none">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-7 mt-7 px-4 w-full sm:w-auto max-w-md sm:max-w-none">
             <Link href="/repo-upload" className="pointer w-full sm:w-auto">
               <div className="relative w-full sm:w-fit rounded-full">
                 <Button className="group relative z-10 text-white bg-black cursor-pointer hover:bg-gray-900 w-full sm:w-fit py-6 sm:py-7 px-8 sm:px-10 text-lg sm:text-xl rounded-full shadow-[0_12px_30px_rgba(0,0,0,0.4)] transition-colors duration-200"> 
@@ -72,15 +72,16 @@ const HomePage = () => {
             </Link> 
           </div>
 
-          <div className="hidden md:block h-[300px] md:h-[100px] lg:h-[200px] w-[90%] overflow-hidden absolute z-0 left-1/2 -translate-x-1/2 max-w-7xl bottom-[2px] bg-gray-50 rounded-2xl pt-10 md:pt-120 lg:pt-180 shadow-purple-400 shadow-[0_0px_30px_rgba(0,0,0,0.4)]">
-            <Image
-              src="/dashboard2.png"
-              alt="Product Demo"
-              fill
-              className="rounded-5xl"
-              draggable={false}
-            />
-          </div>
+          {/* Product Demo Image */}
+          <Image
+            src="/newbg.png"
+            alt="Product Demo"
+            width={1400}
+            height={500}
+            className="hidden md:block w-[90%] max-w-7xl h-auto absolute left-1/2 -translate-x-1/2 bottom-[2px] rounded-2xl shadow-purple-400 shadow-[0_0px_30px_rgba(0,0,0,0.4)] object-contain"
+            draggable={false}
+            priority
+          />
         </div>
       </section>
 

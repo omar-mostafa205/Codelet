@@ -112,7 +112,7 @@ export default function NavBar() {
         </Link>
         <ShineBorder
           shineColor={["#FF6FD8", "#3813C2", "#FF6FD8"]}
-          borderWidth={22}
+          borderWidth={21}
           duration={8}
           className="rounded-full"
         />
@@ -124,7 +124,7 @@ export default function NavBar() {
         </Link>
         <ShineBorder
           shineColor={["#FF6FD8", "#3813C2", "#FF6FD8"]}
-          borderWidth={22}
+          borderWidth={21}
           duration={8}
           className="rounded-full"
         />

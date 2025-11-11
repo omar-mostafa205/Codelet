@@ -3,7 +3,8 @@ import Link from "next/link";
 
 export default function ThreeStepProcess() {
   return (
-    <div className="max-w-7xl mx-auto min-h-screen bg-gray-100 flex items-center justify-center p-6 py-40">
+    <div className="bg-[#f8fafc] min-h-screen w-ful py-30">
+    <div className="max-w-[85rem] mx-auto min-h-screen bg-[#f8fafc] flex items-center justify-center p-6 ">
       <div className="w-[97%] rounded-3xl overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 p-6 bg-white rounded-2xl">
           <div className="p-12 lg:p-16">
@@ -105,6 +106,7 @@ export default function ThreeStepProcess() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
