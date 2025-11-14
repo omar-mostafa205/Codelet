@@ -72,7 +72,6 @@ const HomePage = () => {
             </Link> 
           </div>
 
-          {/* Product Demo Image */}
           <Image
             src="/newbg.png"
             alt="Product Demo"

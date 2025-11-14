@@ -24,8 +24,8 @@ interface NavUserProps {
 const NavUser = ({ user }: NavUserProps) => {
   const { signOut } = useClerk()
   const {openUserProfile} = useClerk()
-  const handleLogout = () => {
-    signOut()
+  const handleLogout =async () => {
+    await signOut()
   }
   const openProfile = () => {
     return null 

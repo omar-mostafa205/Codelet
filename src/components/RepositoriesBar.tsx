@@ -1,9 +1,15 @@
 "use client"
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { ArrowUpRight } from 'lucide-react';
-
+type Repository = {
+  iconColor: string | undefined;
+  progress: ReactNode;
+  id : string
+  name: string;
+  url: string;
+}
 interface RepositoriesBarProps {
-  repositories: any[];
+  repositories: Repository[];
   activeRepo: string;
   onRepoClick: (repoName: string) => void;
 }
@@ -24,7 +30,7 @@ export default function RepositoriesBar({ repositories, activeRepo, onRepoClick 
         <span className="text-sm text-gray-500">{repositories.length} total</span>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        {repositories.map((repo, i) => (
+        {repositories.map((repo : Repository, i) => (
           <div 
             key={repo.id} 
             onClick={() => onRepoClick(repo.name)}

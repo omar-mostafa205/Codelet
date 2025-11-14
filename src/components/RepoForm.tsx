@@ -22,6 +22,7 @@ import React, { useState } from "react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { useUser } from "@clerk/nextjs"
+import GenerateBtn from "./ui/GenerateBtn"
 
 const formSchema = z.object({
   githubUrl: z.string().url("Please provide a valid URL").regex(/^https:\/\/github\.com\//, "Must be a valid GitHub repository URL"),
@@ -179,14 +180,13 @@ const createRepo = api.project.createRepo.useMutation({
               </div>
 
               <div className="flex flex-col items-center pt-4 gap-2">
-                <Button 
+                <GenerateBtn 
                   disabled={isLoading} 
-                  type="submit"
-                  className="h-12 px-8 text-base font-medium bg-black hover:bg-gray-800 text-white rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed border-0"
+                  value = {isLoading ? "Generating..." : "Generate Tutorial"}
                 >
                   <Sparkles className="!w-5 !h-5 mr-1" />
                   {isLoading ? "Generating..." : "Generate Tutorial"}
-                </Button>
+                </GenerateBtn>
                 {isLoading && 
                   <span className="text-sm text-muted-foreground">
                     This might take a few minutes...

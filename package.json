@@ -63,6 +63,7 @@
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1",
     "server-only": "^0.0.1",
+    "styled-components": "^6.1.19",
     "superjson": "^2.2.1",
     "tailwind-merge": "^3.3.1",
     "usehooks-ts": "^3.1.1",

@@ -100,8 +100,6 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
-          {/* Company Section */}
           <div>
             <h3 className="text-lg font-semibold mb-6">Company</h3>
             <address className="not-italic text-gray-300 leading-relaxed">

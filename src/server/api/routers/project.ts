@@ -69,7 +69,19 @@ export const projectRouter = createTRPCRouter({
           message: "User account not found in database. Please refresh and try again.",
         });
       }
-
+      const numOfTuts = await ctx.db.tutorial.count({
+        where: {
+          repo: {
+            userId: ctx.userId
+          }
+        }
+      })
+      if(numOfTuts >= 3){
+        throw new TRPCError({
+          code: "PAYMENT_REQUIRED",
+          message: "You have reached the maximum number of tutorials for this plan.",
+        })
+      }
       const existingRepo = await ctx.db.repo.findFirst({
         where: {
           githubUrl: input.githubUrl,

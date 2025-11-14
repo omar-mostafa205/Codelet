@@ -41,7 +41,6 @@ const LoadingSkeleton = () => (
   </div>
 );
 
-// Separate the component that uses useSearchParams
 function TutorialDashboardContent() {
   const searchParams = useSearchParams();
   const repoId = searchParams.get('repoId');
@@ -206,7 +205,6 @@ function TutorialDashboardContent() {
   );
 }
 
-// Main component that wraps with Suspense
 export default function TutorialDashboard() {
   return (
     <Suspense fallback={<LoadingSkeleton />}>

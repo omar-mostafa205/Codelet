@@ -1,29 +1,173 @@
-# Create T3 App
+# Code Tutorial Generator
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+<img src="codelet.png" className ="w-1400 h-1400"/>
+An AI-powered platform that transforms uploaded codebases into comprehensive, interactive tutorials with intelligent chat assistance.
 
-## What's next? How do I make an app with this?
+## Project Vision
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+This application enables developers to:
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+- **Upload any codebase** (via GitHub repository URL or direct file upload)
+- **Generate comprehensive tutorials** automatically using AI analysis
+- **Chat with AI** about the code to get explanations, suggestions, and answers
+- **Learn interactively** through AI-generated step-by-step guides
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+## ✨Key Features
+
+### Code Upload
+
+- GitHub repository integration with branch selection
+- Direct file/folder upload support
+- Automatic code parsing and analysis
+- Smart file filtering (ignores node_modules, build artifacts, etc.)
+
+### Tutorial Generation
+
+- AI-powered comprehensive tutorial creation
+- Covers architecture, design patterns, and best practices
+- Step-by-step explanations of code functionality
+- Code snippet highlights with context
+- Beginner to advanced learning paths
+
+### AI Chat Assistant
+
+- Interactive Q&A about the uploaded codebase
+- Context-aware responses based on actual code
+- Code refactoring suggestions
+- Debugging assistance
+- Architecture and design pattern explanations
+
+## Tech Stack
+
+This project is built with the [T3 Stack](https://create.t3.gg/):
+
+- **[Next.js](https://nextjs.org)** - React framework for production
+- **[NextAuth.js](https://next-auth.js.org)** - Authentication solution
+- **[Prisma](https://prisma.io)** - Next-generation ORM
+- **[Tailwind CSS](https://tailwindcss.com)** - Utility-first CSS framework
+- **[tRPC](https://trpc.io)** - End-to-end typesafe APIs
+- **[Anthropic Claude](https://www.anthropic.com)** - AI for tutorial generation and chat
+- **[Axios](https://axios-http.com/)** - HTTP client for GitHub API integration
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm/yarn/pnpm
+- GitHub Personal Access Token (for repository uploads)
+- Anthropic API Key (for AI features)
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone <your-repo-url>
+cd <project-name>
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+pnpm install
+# or
+yarn install
+```
+
+3. Set up environment variables:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and add your credentials:
+
+```env
+DATABASE_URL="your-database-url"
+NEXTAUTH_SECRET="your-nextauth-secret"
+NEXTAUTH_URL="http://localhost:3000"
+
+# GitHub API
+GITHUB_TOKEN="your-github-personal-access-token"
+
+# Anthropic API
+ANTHROPIC_API_KEY="your-anthropic-api-key"
+```
+
+4. Set up the database:
+
+```bash
+npx prisma db push
+```
+
+5. Run the development server:
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to see your application.
+
+## How It Works
+
+1. **Upload Code**: Paste a GitHub repository URL or upload your project files
+2. **AI Analysis**: The system processes and analyzes your codebase structure
+3. **Tutorial Generation**: Claude AI generates a comprehensive tutorial covering:
+   - Project overview and architecture
+   - Key components and their relationships
+   - Code patterns and best practices
+   - Setup and usage instructions
+4. **Interactive Chat**: Ask questions and get instant AI-powered explanations about any part of the code
+
+## Project Structure
+
+```
+├── src/
+│   ├── app/              # Next.js app directory
+│   ├── components/       # React components
+│   ├── server/           # tRPC API routes
+│   ├── utils/            # Utility functions
+│   └── styles/           # Global styles
+├── prisma/               # Database schema
+└── public/               # Static assets
+```
 
 ## Learn More
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+### T3 Stack Resources
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+- [T3 Stack Documentation](https://create.t3.gg/)
+- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available)
+- [T3 Stack GitHub](https://github.com/t3-oss/create-t3-app)
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+### Technology Documentation
 
-## How do I deploy this?
+- [Next.js Documentation](https://nextjs.org/docs)
+- [tRPC Documentation](https://trpc.io/docs)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+## Deployment
+
+This application can be deployed on various platforms:
+
+- **[Vercel](https://create.t3.gg/en/deployment/vercel)** (Recommended for Next.js)
+- **[Netlify](https://create.t3.gg/en/deployment/netlify)**
+- **[Docker](https://create.t3.gg/en/deployment/docker)**
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+[Your chosen license]
+
+## Acknowledgments
+
+- Built with [create-t3-app](https://create.t3.gg/)
+- Powered by [Gemeni](https://www.gemeni.com)
+- Inspired by the need for better code learning tools

@@ -60,9 +60,7 @@ export default function DashboardMainView({
           <div className="col-span-2">
             <RecentChats recentChats={recentChats} />
           </div>
-          
-          {/* <QuickStats /> */}
-        </div>
+                  </div>
       </div>
     </div>
   );

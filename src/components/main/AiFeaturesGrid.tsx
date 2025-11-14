@@ -5,7 +5,6 @@ export default function AIFeaturesGrid() {
   return (
     <div className="min-h-[200vh] bg-[#f8fafc] py-30 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-block mb-4">
             <span className="text-sm font-medium text-gray-600 border border-purple-700 rounded-full px-4 py-1 shadow-xl">

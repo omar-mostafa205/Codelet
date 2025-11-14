@@ -47,18 +47,16 @@ export default function TestimonialsSection() {
         backgroundRepeat: 'no-repeat'
       }}
     >
-              <div className='inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-purple-500 mb-4 '>
+          <div className="inline-block mb-4">
+            <span className="text-sm font-medium text-gray-600 border border-purple-700 rounded-full px-4 py-1 shadow-xl">
               WALL OF LOVE
-      </div>
-
-      {/* Title */}
+            </span>
+          </div>
       <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-16 text-center">
         What they're Saying
       </h1>
 
-      {/* Testimonial Card */}
       <div className="relative max-w-2xl w-full mb-20">
-        {/* Navigation Buttons */}
         <button
           onClick={prevTestimonial}
           className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 w-12 h-12 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all shadow-lg"
@@ -99,7 +97,6 @@ export default function TestimonialsSection() {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="flex flex-wrap justify-center gap-16 mb-16">
         <div className="text-center">
           <div className="text-5xl font-bold text-gray-900 mb-2">100+</div>

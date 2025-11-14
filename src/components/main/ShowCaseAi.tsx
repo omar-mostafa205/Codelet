@@ -14,10 +14,11 @@ const ShowCaseAi = () => {
         <div className='relative z-10 w-full px-4 sm:px-6 md:px-8 py-12 sm:py-16 md:py-20'>
           <div className='flex flex-col items-start gap-8 sm:gap-10 md:gap-12 max-w-[70rem] mx-auto'>
             <div className='flex flex-col items-start space-y-4'>
-              <div className='inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20'>
-                <span className='w-2 h-2 bg-purple-500 rounded-full'></span>
-                <span className='text-white text-sm font-medium'>AI FEATURE</span>
-              </div>
+            <div className="inline-block mb-4">
+            <span className="text-sm font-medium text-white border border-purple-700 rounded-full px-4 py-1 shadow-xl">
+              AI FEATURE
+            </span>
+          </div>
               
               <h1 className='text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-white flex flex-row items-center justify-center gap-2 sm:gap-3'>
                 <span>Discover Codelet AI</span>
