@@ -1,6 +1,6 @@
 # Code Tutorial Generator
 
-<img src="codelet.png" className ="w-1400 h-1400"/>
+<img src="codelet.png"alt="Codelet Logo" width="1500"  hieght="1500"/>
 An AI-powered platform that transforms uploaded codebases into comprehensive, interactive tutorials with intelligent chat assistance.
 
 ## Project Vision
