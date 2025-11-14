@@ -1,6 +1,7 @@
 # Code Tutorial Generator
 
-<img src="codelet.png"alt="Codelet Logo" width="1500"  hieght="1500"/>
+<img src="codelet.png" alt="Codelet Logo" width="1500" height="1500"/>
+
 An AI-powered platform that transforms uploaded codebases into comprehensive, interactive tutorials with intelligent chat assistance.
 
 ## Project Vision
@@ -12,7 +13,7 @@ This application enables developers to:
 - **Chat with AI** about the code to get explanations, suggestions, and answers
 - **Learn interactively** through AI-generated step-by-step guides
 
-## ✨Key Features
+## Key Features
 
 ### Code Upload
 
@@ -46,7 +47,7 @@ This project is built with the [T3 Stack](https://create.t3.gg/):
 - **[Prisma](https://prisma.io)** - Next-generation ORM
 - **[Tailwind CSS](https://tailwindcss.com)** - Utility-first CSS framework
 - **[tRPC](https://trpc.io)** - End-to-end typesafe APIs
-- **[Anthropic Claude](https://www.anthropic.com)** - AI for tutorial generation and chat
+- **[Google Gemini](https://deepmind.google/technologies/gemini/)** - AI for tutorial generation and chat
 - **[Axios](https://axios-http.com/)** - HTTP client for GitHub API integration
 
 ## Getting Started
@@ -56,15 +57,15 @@ This project is built with the [T3 Stack](https://create.t3.gg/):
 - Node.js 18+
 - npm/yarn/pnpm
 - GitHub Personal Access Token (for repository uploads)
-- Anthropic API Key (for AI features)
+- Google Gemini API Key (for AI features)
 
 ### Installation
 
 1. Clone the repository:
 
 ```bash
-git clone <your-repo-url>
-cd <project-name>
+git clone https://github.com/omar-mostafa205/Codelet.git
+cd Codelet
 ```
 
 2. Install dependencies:
@@ -93,8 +94,8 @@ NEXTAUTH_URL="http://localhost:3000"
 # GitHub API
 GITHUB_TOKEN="your-github-personal-access-token"
 
-# Anthropic API
-ANTHROPIC_API_KEY="your-anthropic-api-key"
+# Google Gemini API
+GEMINI_API_KEY="your-gemini-api-key"
 ```
 
 4. Set up the database:
@@ -115,7 +116,7 @@ Open [http://localhost:3000](http://localhost:3000) to see your application.
 
 1. **Upload Code**: Paste a GitHub repository URL or upload your project files
 2. **AI Analysis**: The system processes and analyzes your codebase structure
-3. **Tutorial Generation**: Claude AI generates a comprehensive tutorial covering:
+3. **Tutorial Generation**: Gemini AI generates a comprehensive tutorial covering:
    - Project overview and architecture
    - Key components and their relationships
    - Code patterns and best practices
@@ -169,5 +170,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Acknowledgments
 
 - Built with [create-t3-app](https://create.t3.gg/)
-- Powered by [Gemeni](https://www.gemeni.com)
+- Powered by [Google Gemini](https://deepmind.google/technologies/gemini/)
 - Inspired by the need for better code learning tools
