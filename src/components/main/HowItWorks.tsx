@@ -22,7 +22,7 @@ export default function ThreeStepProcess() {
             
             <div className="flex flex-wrap gap-4">
               <Link
-              href='/repo-upload'
+              href='/robot.png'
                className="bg-gray-900 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors">
                 Get Started
               </Link>
@@ -31,7 +31,7 @@ export default function ThreeStepProcess() {
           
           <div className="relative min-h-[400px] lg:min-h-0 rounded-2xl">
             <Image 
-              src="/img.png" 
+              src="/robot.png" 
               alt="Background" 
               width={700}
               height={700}

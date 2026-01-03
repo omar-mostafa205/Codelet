@@ -41,7 +41,7 @@ const ShowCase = () => {
                                 muted
                                 playsInline
                             >
-                                <source src="/chapter.mov" type="video/mp4" />
+                                <source src="/chapter.mp4" type="video/mp4" />
                                 Your browser does not support the video tag.
                             </video>
                         </div>

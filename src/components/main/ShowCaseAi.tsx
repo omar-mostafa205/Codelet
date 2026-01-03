@@ -40,7 +40,7 @@ const ShowCaseAi = () => {
                   muted
                   playsInline
                 >
-                  <source src="/ai.mov" type="video/mp4" />
+                  <source src="/ai.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
               </div>
