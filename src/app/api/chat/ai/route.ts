@@ -10,185 +10,232 @@ import { google } from '@ai-sdk/google';
 import { NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
 
+const aiModel = google("gemini-2.0-flash");
 
-const aiModel = google("gemma-3-12b-it");
-export const POST = async (request: Request)  => {
-    try {
-        const user = await currentUser();
-        const { messages, chatId , tutorialId}: { messages: UIMessage[], chatId: string  , tutorialId: string} = await request.json();
-        console.log("the Caht ID", chatId);
-        const userMessages = messages.filter(message => message.role === "user");
-        const latestUserMessage = userMessages.at(-1);
-        const first = userMessages[0]
-        const messageText = latestUserMessage?.parts
-            ?.filter((part) => part.type === "text")
-            ?.map((part) => part.text)
-            ?.join(" ") || "";
-        const savedUserMessage = await db.chatMessage.create({
-            data: {
-                role: 'USER',
-                content: messageText,
-                chatId: chatId
-            }
-        });
-        if (userMessages.length === 1) {
-            await db.chatSession.upsert({
-              where: { id: chatId },
-              update: {
-                title: first?.parts?.find((part) => part.type === "text")?.text || "Chat",
-              },
-              create: {
-                id: chatId,
-                title: first?.parts?.find((part) => part.type === "text")?.text || "Chat",
-                tutorialId: tutorialId, 
-                isActive: true, 
-              },
-            });
-          }
-    
+const LANGUAGE_MAP: Record<string, string> = {
+  'ts': 'TypeScript',
+  'tsx': 'TypeScript (React)',
+  'js': 'JavaScript',
+  'jsx': 'JavaScript (React)',
+  'py': 'Python',
+  'java': 'Java',
+  'go': 'Go',
+  'rs': 'Rust',
+  'cpp': 'C++',
+  'c': 'C',
+  'cs': 'C#',
+  'rb': 'Ruby',
+  'php': 'PHP',
+  'swift': 'Swift',
+  'kt': 'Kotlin',
+  'vue': 'Vue',
+  'svelte': 'Svelte',
+  'html': 'HTML',
+  'css': 'CSS',
+  'scss': 'SCSS',
+  'json': 'JSON',
+  'yaml': 'YAML',
+  'yml': 'YAML',
+  'md': 'Markdown',
+  'sql': 'SQL',
+  'prisma': 'Prisma',
+};
 
-        const queryVector = await generateEmbedding(messageText);
-        const chatSession = await db.chatSession.findUnique({
-            where: { id: chatId },
-            select: { tutorialId: true }
-        });
+async function getProjectOverview(tutorialId: string) {
+  const allFiles = await db.sourceCodeEmbedding.findMany({
+    where: { tutorialId },
+    select: { fileName: true, summary: true },
+  });
 
-        if (!chatSession) {
-            return NextResponse.json({ error: "Chat session not found" }, { status: 404 });
-        }
+  if (allFiles.length === 0) {
+    return { overview: "No code files found for this project.", fileCount: 0, languages: [] };
+  }
 
-        const result = await db.$queryRaw`
-            SELECT "fileName", "summary", "sourceCode",
-            1-("summaryEmbedding" <=> ${queryVector}::vector) AS similarity
-            FROM "SourceCodeEmbedding"
-            WHERE 1-("summaryEmbedding" <=> ${queryVector}::vector) > 0.5
-            AND "tutorialId" = ${chatSession.tutorialId}
-            ORDER BY similarity DESC
-            LIMIT 10
-        ` as {fileName: string; sourceCode: string; summary: string; similarity: number}[];
-        
-        let content = '';
-        for (const doc of result) {
-            content += `source: ${doc.fileName}\ncode content: ${doc.sourceCode}\nsummary of file: ${doc.summary}\n\n`;
-        }
-const prompt = `You are a world-class senior software engineer and technical mentor with expertise in modern development practices. You specialize in providing comprehensive, educational, and actionable responses that rival the best AI coding assistants 
-        If you don't know the answer or it has no relvancy say "I am sorry, I don't have enough  information please provide more context" JUST THAT .
-
-        CORE PRINCIPLES:
-        - Be thorough but concise - every word should add value
-        - Provide complete, production-ready solutions
-        - Always include visual diagrams using Mermaid syntax
-        - Structure responses for maximum readability and understanding
-        - Focus on teaching principles, not just showing code
-        - Consider performance, security, and maintainability in every response
-        
-        QUESTION:
-        ${latestUserMessage?.parts?.filter((part) => part.type === "text").map((part) => part.text).join(" ")}
-        
-        CONTEXT:
-        ${content}
-        
-        ## Response Structure
-        - Always provide complete, working code examples when relevant
-        - Include visual diagrams using mermaid syntax when explaining concepts
-        - Use step-by-step explanations with clear numbered steps
-        - Provide multiple approaches when applicable
-        - Include error handling and best practices in all code examples
-        
-        ## Code Standards
-        - Use modern syntax and current best practices
-        - Include proper imports and dependencies
-        - Add comprehensive comments explaining logic
-        - Provide complete, runnable examples (not snippets)
-        - Include TypeScript types when applicable
-        
-        ## Visual Elements - MERMAID SYNTAX REQUIREMENTS
-        When creating Mermaid diagrams, STRICTLY follow these rules:
-        
-        ### For ER Diagrams:
-        - Use lowercase data types ONLY: string, boolean, datetime, json, int (NEVER String, Boolean, DateTime, Json)
-        - Use simple constraint syntax: "fieldName datatype PK" or "fieldName datatype FK"
-        - DO NOT use optional syntax like "String?" - just use "string"
-        - DO NOT use complex constraint descriptions like 'PK "UUID"' - just use "PK"
-        - DO NOT use complex FK references like 'FK "references User.id"' - just use "FK"
-        - Use proper relationship syntax: EntityA ||--o{ EntityB : "relationship_name"
-        
-        CORRECT ER Diagram Example:
-        \`\`\`mermaid
-        erDiagram
-            User {
-                string id PK
-                string email
-                string name
-                datetime createdAt
-            }
-            Profile {
-                string id PK
-                string userId FK
-                string subscriptionTier
-                boolean isActive
-                json preferences
-            }
-            User ||--o{ Profile : "has"
-        \`\`\`
-        
-        ### For Other Diagrams:
-        - flowchart: Use for process flows, user journeys
-        - sequenceDiagram: Use for API calls, interactions
-        - classDiagram: Use for code structure, inheritance
-        - gitgraph: Use for branching strategies
-        
-        ## Response Format
-        Always structure responses with:
-        1. Quick Answer (1-2 sentences)
-        2. Implementation (complete code with comments)
-        3. Step-by-step explanation
-        4. Mermaid diagram when applicable (following the syntax rules above)
-        CRITICAL: When creating ER diagrams, always use lowercase data types and simple syntax as shown in the example above.`;
-
-        const promptMessage: UIMessage = {
-            id: crypto.randomUUID(),
-            role: 'user',
-            parts: [
-                {
-                    type: 'text',
-                    text: prompt
-                }
-            ]
-        };
-
-        const response = await streamText({
-            model: aiModel,
-            messages: convertToModelMessages([
-                ...messages,
-                promptMessage
-            ]),
-            temperature: 0.8,
-            onFinish: async (result) => {
-                try {
-                    const aiMessage = await db.chatMessage.create({
-                        data: {
-                            role: 'ASSISTANT', 
-                            content: result.text,
-                            chatId: chatId
-                        }
-                    });
-            
-                    await db.aiAnswer.create({
-                        data: {
-                            explanation: result.text,
-                            fileRef: [],
-                            chatMessageId: aiMessage.id
-                        }
-                    });
-                } catch (error) {
-                    console.error('Failed to save AI message:', error);
-                }
-            }
-        });
-        return response.toUIMessageStreamResponse();
-    } catch (error) {
-        console.error('API Error:', error);
-        return NextResponse.json({ error: "Failed to create chat" }, { status: 500 });
+  const extensionCounts: Record<string, number> = {};
+  allFiles.forEach(file => {
+    const ext = file.fileName.split('.').pop()?.toLowerCase();
+    if (ext) {
+      extensionCounts[ext] = (extensionCounts[ext] || 0) + 1;
     }
+  });
+
+  const languages = [...new Set(
+    Object.keys(extensionCounts)
+      .map(ext => LANGUAGE_MAP[ext])
+      .filter(Boolean)
+  )];
+
+  const overview = `
+## Project Overview
+- **Total files indexed:** ${allFiles.length}
+- **Languages detected:** ${languages.length > 0 ? languages.join(', ') : 'Unknown'}
+- **File types:** ${Object.entries(extensionCounts).map(([ext, count]) => `.${ext} (${count})`).join(', ')}
+
+## File Structure (sample):
+${allFiles.slice(0, 15).map(f => `- ${f.fileName}`).join('\n')}
+${allFiles.length > 15 ? `\n... and ${allFiles.length - 15} more files` : ''}
+
+## File Summaries:
+${allFiles.slice(0, 10).map(f => `- **${f.fileName}**: ${f.summary?.slice(0, 100) || 'No summary'}...`).join('\n')}
+`;
+
+  return { overview, fileCount: allFiles.length, languages };
+}
+
+export const POST = async (request: Request) => {
+  try {
+    const user = await currentUser();
+    const { messages, chatId, tutorialId }: { messages: UIMessage[], chatId: string, tutorialId: string } = await request.json();
+    
+    console.log("Chat ID:", chatId);
+    
+    const userMessages = messages.filter(message => message.role === "user");
+    const latestUserMessage = userMessages.at(-1);
+    const first = userMessages[0];
+    
+    const messageText = latestUserMessage?.parts
+      ?.filter((part) => part.type === "text")
+      ?.map((part) => part.text)
+      ?.join(" ") || "";
+
+    // Save user message
+    await db.chatMessage.create({
+      data: {
+        role: 'USER',
+        content: messageText,
+        chatId: chatId
+      }
+    });
+
+    if (userMessages.length === 1) {
+      await db.chatSession.upsert({
+        where: { id: chatId },
+        update: {
+          title: first?.parts?.find((part) => part.type === "text")?.text?.slice(0, 50) || "Chat",
+        },
+        create: {
+          id: chatId,
+          title: first?.parts?.find((part) => part.type === "text")?.text?.slice(0, 50) || "Chat",
+          tutorialId: tutorialId,
+          isActive: true,
+        },
+      });
+    }
+
+    const chatSession = await db.chatSession.findUnique({
+      where: { id: chatId },
+      select: { tutorialId: true }
+    });
+
+    if (!chatSession) {
+      return NextResponse.json({ error: "Chat session not found" }, { status: 404 });
+    }
+
+    const { overview: projectOverview, fileCount, languages } = await getProjectOverview(chatSession.tutorialId);
+
+    const queryVector = await generateEmbedding(messageText);
+    
+    const relevantCode = await db.$queryRaw`
+      SELECT "fileName", "summary", "sourceCode",
+      1-("summaryEmbedding" <=> ${queryVector}::vector) AS similarity
+      FROM "SourceCodeEmbedding"
+      WHERE "tutorialId" = ${chatSession.tutorialId}
+      ORDER BY 1-("summaryEmbedding" <=> ${queryVector}::vector) DESC
+      LIMIT 10
+    ` as { fileName: string; sourceCode: string; summary: string; similarity: number }[];
+
+    console.log(`Found ${relevantCode.length} relevant files`);
+    console.log("Top matches:", relevantCode.slice(0, 3).map(r => `${r.fileName}: ${r.similarity.toFixed(3)}`));
+
+    // Build code context
+    let codeContext = '';
+    if (relevantCode.length > 0) {
+      for (const doc of relevantCode) {
+        codeContext += `
+### File: ${doc.fileName}
+**Relevance Score:** ${(doc.similarity * 100).toFixed(1)}%
+**Summary:** ${doc.summary}
+**Source Code:**
+\`\`\`
+${doc.sourceCode.slice(0, 2000)}
+\`\`\`
+
+`;
+      }
+    } else {
+      codeContext = "No specific code snippets were found matching your query.";
+    }
+
+    const prompt = `You are a helpful AI assistant that answers questions about a specific codebase. You have been given access to the project's source code and documentation.
+
+## CRITICAL RULES:
+1. ONLY answer based on the code and project information provided below
+2. If the provided context contains the answer, give a clear, helpful response
+3. If the context does NOT contain enough information, say: "Based on the code I have access to, I cannot find specific information about [topic]. However, from the project overview, I can see [relevant info]."
+4. NEVER make up code, files, or functionality that isn't shown in the context
+5. For general questions like "what language is used", refer to the Project Overview section
+6. Reference specific files when answering (e.g., "In src/index.ts, we can see...")
+
+${projectOverview}
+
+## Relevant Code Snippets:
+${codeContext}
+
+## User Question:
+${messageText}
+
+## How to Answer:
+1. First check if the Project Overview answers the question (for general questions)
+2. Then check the Relevant Code Snippets for specific implementation details
+3. Provide a clear, structured answer with:
+   - Direct answer to the question
+   - Code examples from the context (if relevant)
+   - File references
+   - Mermaid diagrams (if helpful for explanation)
+
+## Mermaid Diagram Rules (if you include diagrams):
+- ER diagrams: Use lowercase types (string, int, boolean, datetime)
+- Use simple syntax: "fieldName datatype PK" not complex constraints
+- flowchart/sequenceDiagram for processes and interactions
+
+Answer the user's question now:`;
+
+    const promptMessage: UIMessage = {
+      id: crypto.randomUUID(),
+      role: 'user',
+      parts: [{ type: 'text', text: prompt }]
+    };
+
+    const response = await streamText({
+      model: aiModel,
+      messages: convertToModelMessages([...messages, promptMessage]),
+      temperature: 0.3, 
+      onFinish: async (result) => {
+        try {
+          const aiMessage = await db.chatMessage.create({
+            data: {
+              role: 'ASSISTANT',
+              content: result.text,
+              chatId: chatId
+            }
+          });
+
+          await db.aiAnswer.create({
+            data: {
+              explanation: result.text,
+              fileRef: relevantCode.slice(0, 5).map(r => r.fileName),
+              chatMessageId: aiMessage.id
+            }
+          });
+        } catch (error) {
+          console.error('Failed to save AI message:', error);
+        }
+      }
+    });
+
+    return response.toUIMessageStreamResponse();
+  } catch (error) {
+    console.error('API Error:', error);
+    return NextResponse.json({ error: "Failed to create chat" }, { status: 500 });
+  }
 };

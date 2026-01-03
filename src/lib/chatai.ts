@@ -83,15 +83,31 @@ export async function loadGitHubData(repoUrl: string, accessToken?: string): Pro
 
 export async function summarizeCode(doc: Document): Promise<string> {
     const code = doc.pageContent.slice(0, 1000);
-    const prompt = `You are an intelligent senior software engineer who specializes in onboarding junior software engineers onto projects.
-    You are onboarding a junior software engineer and explaining to them the purpose of the ${doc.metadata.source} file.
+    const fileName = doc.metadata.source;
+    
+    const prompt = `You are a senior software engineer summarizing code for documentation purposes.
 
-    Here is the code:
-    \`\`\`
-    ${code}
-    \`\`\`
+## STRICT RULES:
+- ONLY describe what is explicitly present in the code below
+- DO NOT assume, infer, or add functionality that isn't shown
+- DO NOT reference external files, APIs, or systems unless explicitly imported/used in the code
+- If the code is incomplete or unclear, say "This snippet shows..." rather than guessing
+- If you cannot determine the purpose from the code alone, state that clearly
 
-    Give a summary no more than 100 words of the code above.`;
+## FILE: ${fileName}
+
+## CODE:
+\`\`\`
+${code}
+\`\`\`
+
+## TASK:
+Provide a factual summary (max 100 words) covering:
+1. What this code ACTUALLY does (based only on what's shown)
+2. Key functions/classes/exports defined (if any)
+3. Dependencies imported (if any)
+
+DO NOT make up functionality. Only describe what you can see in the code above.`;
 
     const result = await codeAnalysisModel.generateContent(prompt);
     return result.response.text().trim();
