@@ -11,7 +11,8 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "@/server/db";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server"; // 👈 Add currentUser
+
 /**
  * 1. CONTEXT
  *
@@ -75,34 +76,74 @@ export const createCallerFactory = t.createCallerFactory;
 export const createTRPCRouter = t.router;
 
 /**
- * Middleware for timing procedure execution and adding an artificial delay in development.
- *
- * You can remove this if you don't like it, but it can help catch unwanted waterfalls by simulating
- * network latency that would occur in production but not in local development.
+ * Middleware that:
+ * 1. Checks if user is authenticated with Clerk
+ * 2. Syncs user to database if they don't exist
+ * 3. Adds user to context
  */
 const enforceClerkUserIsAuthed = t.middleware(async ({ ctx, next }) => {
-  const {userId}  = await auth()
-   console.log(userId)
+  const { userId } = await auth();
+  console.log("Auth userId:", userId);
 
-  if (!userId) { 
+  if (!userId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+
+  // Check if user exists in database
+  let dbUser = await ctx.db.user.findUnique({
+    where: { id: userId },
+  });
+
+  // If user doesn't exist, sync from Clerk
+  if (!dbUser) {
+    console.log("User not in DB, syncing from Clerk...");
+    
+    const clerkUser = await currentUser();
+
+    if (!clerkUser) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not found in Clerk",
+      });
+    }
+
+    const email = clerkUser.emailAddresses.find(
+      (e) => e.id === clerkUser.primaryEmailAddressId
+    )?.emailAddress;
+
+    dbUser = await ctx.db.user.create({
+      data: {
+        id: clerkUser.id,
+        email: email || "",
+        firstName: clerkUser.firstName || "",
+        lastName: clerkUser.lastName || "",
+        image: clerkUser.imageUrl,
+      },
+    });
+
+    console.log("✅ User synced to database:", dbUser.id);
+  }
+
   return next({
     ctx: {
       ...ctx,
-      userId : userId
-    
+      userId: userId,
+      user: dbUser, // 👈 Now ctx.user is available!
     },
   });
 });
 
+export const protectedProcedure = t.procedure.use(enforceClerkUserIsAuthed);
 
-export const ProtectedProcedure = t.procedure.use(enforceClerkUserIsAuthed)
+// 👆 Changed to lowercase "protectedProcedure" for consistency
+
+/**
+ * Middleware for timing procedure execution and adding an artificial delay in development.
+ */
 const timingMiddleware = t.middleware(async ({ next, path }) => {
   const start = Date.now();
 
   if (t._config.isDev) {
-    // artificial delay in dev
     const waitMs = Math.floor(Math.random() * 400) + 100;
     await new Promise((resolve) => setTimeout(resolve, waitMs));
   }

@@ -42,7 +42,7 @@ export function RepoForm() {
     onError: async (error) => {
       setIsLoading(false)
       toast.error(error.message)
-      window.location.href = `/dashboard`
+      // window.location.href = `/dashboard`
     }
   })
 
