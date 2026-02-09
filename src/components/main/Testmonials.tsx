@@ -2,6 +2,31 @@
 /* eslint-disable @next/next/no-img-element */
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: {
+    opacity: 0,
+    y: 24,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut",
+    },
+  },
+};
 
 export default function TestimonialsSection() {
 
@@ -13,7 +38,7 @@ export default function TestimonialsSection() {
       avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
     },
     {
-      text: "Our onboarding process has completely transformed. New engineers can now grasp the code structure in days instead of weeks, thanks to Fluence AI’s step-by-step guides.",
+      text: "Our onboarding process has completely transformed. New engineers can now grasp the code structure in days instead of weeks, thanks to Fluence AI's step-by-step guides.",
       name: "Michael Chen",
       role: "Engineering Manager, CodeFlow Inc",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop"
@@ -38,7 +63,7 @@ export default function TestimonialsSection() {
 
   return (
     <div className="bg-[#f8fafc] min-h-screen w-[97vw] mx-auto py-30">
-    <div 
+    <motion.div 
       className=" flex flex-col items-center justify-center px-5 py-26 mt-0  sm:pt-20 relative mx-auto rounded-2xl bg-[#f8fafc]"
       style={{
         backgroundImage: 'url(/bg.png)',
@@ -46,17 +71,24 @@ export default function TestimonialsSection() {
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-100px" }}
     >
-          <div className="inline-block mb-4">
+          <motion.div className="inline-block mb-4" variants={itemVariants}>
             <span className="text-sm font-medium text-gray-600 border border-purple-700 rounded-full px-4 py-1 shadow-xl">
               WALL OF LOVE
             </span>
-          </div>
-      <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-16 text-center">
+          </motion.div>
+      <motion.h1 
+        className="text-5xl md:text-6xl font-bold text-gray-900 mb-16 text-center"
+        variants={itemVariants}
+      >
         What they're Saying
-      </h1>
+      </motion.h1>
 
-      <div className="relative max-w-2xl w-full mb-20">
+      <motion.div className="relative max-w-2xl w-full mb-20" variants={itemVariants}>
         <button
           onClick={prevTestimonial}
           className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 w-12 h-12 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all shadow-lg"
@@ -95,9 +127,12 @@ export default function TestimonialsSection() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="flex flex-wrap justify-center gap-16 mb-16">
+      <motion.div 
+        className="flex flex-wrap justify-center gap-16 mb-16"
+        variants={itemVariants}
+      >
         <div className="text-center">
           <div className="text-5xl font-bold text-gray-900 mb-2">100+</div>
           <div className="text-sm text-gray-700">Businesses are Happy</div>
@@ -110,9 +145,9 @@ export default function TestimonialsSection() {
           <div className="text-5xl font-bold text-gray-900 mb-2">98%</div>
           <div className="text-sm text-gray-700">Customer Satisfied</div>
         </div>
-      </div>
+      </motion.div>
 
-      <section className="bg-transparent py-16">
+      <motion.section className="bg-transparent py-16" variants={itemVariants}>
             <div className="mx-auto max-w-5xl px-6">
                 <h2 className="text-center text-4xl font-semibold -mb-10">Devlopers from these companies use Codelet</h2>
                 <div className="mx-auto mt-20 flex max-w-4xl flex-wrap items-center justify-center gap-x-12 gap-y-8 sm:gap-x-16 sm:gap-y-12 text-gray-500">
@@ -129,10 +164,11 @@ export default function TestimonialsSection() {
                     <img className="h-5 w-fit grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300" src="https://html.tailus.io/blocks/customers/zapier.svg" alt="Zapier Logo" height="20" width="auto" />
                 </div>
             </div>
-        </section>
+        </motion.section>
     
  
-    </div>
+    </motion.div>
     </div>
   );
 }
+

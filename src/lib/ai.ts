@@ -46,7 +46,6 @@ export async function generateTutorial(githubUrl: string, accessToken: string): 
         console.log("Attempting to parse repaired JSON...");
         return JSON.parse(repairedJson);
       } catch (secondError) {
-        // Find the actual error location
         const errorMessage = secondError instanceof Error ? secondError.message : String(secondError);
         const errorMatch = errorMessage.match(/position (\d+)/);
         const errorPos = errorMatch ? parseInt(errorMatch[1]) : 0;
@@ -118,3 +117,4 @@ export async function getTutorialDataWithSeparation(githubUrl: string, accessTok
     throw error;
   }
 }
+

@@ -11,7 +11,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "@/server/db";
-import { auth, currentUser } from "@clerk/nextjs/server"; // 👈 Add currentUser
+import { auth, currentUser } from "@clerk/nextjs/server";
 
 /**
  * 1. CONTEXT
@@ -121,7 +121,7 @@ const enforceClerkUserIsAuthed = t.middleware(async ({ ctx, next }) => {
       },
     });
 
-    console.log("✅ User synced to database:", dbUser.id);
+    console.log("User synced to database:", dbUser.id);
   }
 
   return next({

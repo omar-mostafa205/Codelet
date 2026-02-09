@@ -1,5 +1,30 @@
 import Image from "next/image";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
+import { motion } from "framer-motion";
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: {
+    opacity: 0,
+    y: 24,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut",
+    },
+  },
+};
 
 const features = [
   {
@@ -142,10 +167,18 @@ const features = [
 
 export function BentoGridD() {
   return (
+    <motion.div
+    variants={containerVariants}
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, margin: "-100px" }}
+  >
     <BentoGrid className="max-w-7xl mx-auto">
       {features.map((feature, idx) => (
         <BentoCard key={idx} {...feature} />
       ))}
     </BentoGrid>
+    </motion.div>
+
   );
 }

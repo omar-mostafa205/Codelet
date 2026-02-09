@@ -53,8 +53,6 @@ export const projectRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        // ✅ No need to check ctx.userId or find user - middleware handles it!
-        // ctx.user is guaranteed to exist
 
         const numOfTuts = await ctx.db.tutorial.count({
           where: {
