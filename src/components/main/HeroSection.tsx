@@ -1,0 +1,77 @@
+"use client"
+import React from 'react'
+import Image from 'next/image'
+import { Play, Rocket } from 'lucide-react'
+import { Button } from '../ui/button'
+import Link from 'next/link'
+import { ShineBorder } from '../ShineBorder'
+import toast from 'react-hot-toast'
+export const HeroSection = () => {
+  return (
+
+    <section id="home" 
+    className="
+    relative w-[98vw] mx-auto mt-24 mb-8
+    flex items-center justify-center
+    rounded-2xl z-10 bg-[#f8fafc] overflow-hidden
+    min-h-[50vh] md:min-h-[100vh] lg:min-h-[140vh]
+    pb-20 sm:pb-32 lg:pb-48
+  "
+  >
+    <Image
+      src="/bg.png"
+      alt="Hero Background"
+      fill
+      className="rounded-2xl object-cover "
+      priority
+    />
+
+    <div className="absolute inset-0 flex rounded-xl flex-col items-center gap-1">
+      <h1 className="text-black text-4xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-[100px] font-bold drop-shadow-2xl text-center p-4 mt-8 md:mt-12">
+        The AI Codebases Guide
+      </h1>
+      <p className="text-black text-lg sm:text-xl md:text-2xl drop-shadow-2xl text-center px-4 sm:px-2">
+        The fastest way to understand any codebase, built to ramp devs in days, not months.
+      </p>
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-7 mt-7 px-4 w-full sm:w-auto max-w-md sm:max-w-none">
+        <Link href="/community" onClick={() => toast.error("Ai credit limit exceeded explore the community for now!", { duration: 6000 })} className="pointer w-full sm:w-auto">
+          <div className="relative w-full sm:w-fit rounded-full">
+            <Button className="group relative z-10 text-white bg-black cursor-pointer hover:bg-gray-900 w-full sm:w-fit py-6 sm:py-7 px-8 sm:px-10 text-lg sm:text-xl rounded-full shadow-[0_12px_30px_rgba(0,0,0,0.4)] transition-colors duration-200"> 
+              <Rocket 
+                width={30} 
+                height={30} 
+                className="!w-5 !h-5 sm:!w-6 sm:!h-6 transform transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 group-hover:translate-x-1" 
+              />
+              Accelerate My Learning
+            </Button>
+
+            <ShineBorder
+              shineColor={["#FF6FD8", "#3813C2", "#FF6FD8"]}
+              borderWidth={30}
+              duration={8}
+              className="rounded-full hidden sm:block"
+              />
+          </div>
+        </Link>
+
+        <Link href="/" className="pointer w-full sm:w-auto">
+          <Button className="text-black backdrop-blur-md bg-white/20 border-1 border-white w-full sm:w-fit py-6 sm:py-7 px-8 sm:px-10 text-lg sm:text-xl hover:bg-gray-40 rounded-full cursor-pointer transition-colors duration-200">
+            <Play className="!w-5 !h-5 sm:!w-6 sm:!h-6 mr-1" />
+            Watch a Demo
+          </Button>
+        </Link> 
+      </div>
+
+      <Image
+        src="/newbg.png"
+        alt="Product Demo"
+        width={1400}
+        height={500}
+        className="hidden md:block w-[90%] max-w-7xl h-auto absolute left-1/2 -translate-x-1/2 bottom-[2px] rounded-2xl shadow-purple-400 shadow-[0_0px_30px_rgba(0,0,0,0.4)] object-contain"
+        draggable={false}
+        priority
+      />
+    </div>
+  </section>    
+)
+}

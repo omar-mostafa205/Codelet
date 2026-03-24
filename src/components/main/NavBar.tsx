@@ -118,8 +118,8 @@ export default function NavBar() {
         />
       </div>
       :(       <div className="relative rounded-full hidden lg:block cursor-pointer">
-        <Link href="/dashboard" className="relative z-10 bg-black cursor-pointer text-white rounded-full px-6 py-2  flex flex-row gap-2 justify-center items-center">
-          Dashboard
+        <Link href="/community" className="relative z-10 bg-black cursor-pointer text-white rounded-full px-6 py-2  flex flex-row gap-2 justify-center items-center">
+          Community
           <ArrowUpRight className="w-5 h-5" />
         </Link>
         <ShineBorder

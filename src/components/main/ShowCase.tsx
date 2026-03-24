@@ -4,6 +4,7 @@ import React from 'react'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast';
 
 const containerVariants = {
   hidden: {},
@@ -24,7 +25,7 @@ const itemVariants = {
     x: 0,
     transition: {
       duration: 0.6,
-      ease: "easeOut",
+    ease: "easeInOut",
     },
   },
 };
@@ -63,8 +64,9 @@ const ShowCase = () => {
                     
                     <motion.div variants={itemVariants}>
                         <Link
-                            href='/repo-upload'
+                            href='/community'
                             className='w-fit flex items-center gap-3 bg-black text-white px-6 py-4 rounded-full hover:bg-gray-800 transition-colors font-medium'
+                            onClick={()=> toast.error('Ai credit limit exceeded explore the community for now') }
                         >
                             Start for free
                             <ArrowRight className='w-5 h-5' />

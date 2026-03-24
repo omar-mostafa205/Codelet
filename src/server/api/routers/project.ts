@@ -470,6 +470,16 @@ export const projectRouter = createTRPCRouter({
       return latestTutorials;
     }),
 
+    getAllTutorials: protectedProcedure
+    .query(async ({ ctx }) => {
+      const allTutorials = await ctx.db.tutorial.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+      return allTutorials;
+    }),
+    
   getChatMessages: protectedProcedure
     .input(
       z.object({

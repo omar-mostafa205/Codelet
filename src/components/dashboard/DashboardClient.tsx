@@ -1,5 +1,5 @@
 "use client";
-import { Github, BookOpen, MessageSquare, Calendar, TrendingUp, Clock, Sparkles, ChevronRight } from 'lucide-react';
+import { BookOpen, MessageSquare, Calendar, TrendingUp, Clock, Sparkles, ChevronRight } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { api } from '@/trpc/react';
 import { DashboardSkeleton } from './DashboardSkeleton';

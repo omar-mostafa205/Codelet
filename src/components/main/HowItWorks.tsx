@@ -1,5 +1,7 @@
+"use client"
 import Image from "next/image";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function ThreeStepProcess() {
   return (
@@ -23,7 +25,10 @@ export default function ThreeStepProcess() {
             <div className="flex flex-wrap gap-4">
               <Link
               href='/ii.png'
-               className="bg-gray-900 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors">
+              className="bg-gray-900 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+              onClick={()=> toast.error("Ai credit limit exceeded explore the community for now!", { duration: 6000 })}
+
+               >
                 Get Started
               </Link>
             </div>
